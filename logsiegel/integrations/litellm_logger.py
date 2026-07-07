@@ -3,9 +3,9 @@
 Usage (LiteLLM proxy or SDK):
 
     import litellm
-    from klarlog.integrations.litellm_logger import KlarlogLogger
+    from logsiegel.integrations.litellm_logger import LogsiegelLogger
 
-    litellm.callbacks = [KlarlogLogger("/var/lib/klarlog/prod")]
+    litellm.callbacks = [LogsiegelLogger("/var/lib/logsiegel/prod")]
 
 Only metadata and salted hashes enter the log; prompts/responses are stored
 encrypted (per-entry key, crypto-shreddable) when ``store_payload=True``.
@@ -15,7 +15,7 @@ Attribute names follow the OpenTelemetry GenAI semantic conventions.
 
 from __future__ import annotations
 
-from ..core import Klarlog
+from ..core import Logsiegel
 
 try:
     from litellm.integrations.custom_logger import CustomLogger
@@ -33,9 +33,9 @@ def _text(messages) -> str:
         return str(messages)
 
 
-class KlarlogLogger(CustomLogger):
+class LogsiegelLogger(CustomLogger):
     def __init__(self, log_dir: str, store_payload: bool = False):
-        self.lb = Klarlog(log_dir)
+        self.lb = Logsiegel(log_dir)
         self.store_payload = store_payload
 
     def _record(self, kwargs, response_obj, start_time, end_time, error: str | None = None):

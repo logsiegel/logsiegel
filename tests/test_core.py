@@ -2,12 +2,12 @@ import json
 
 import pytest
 
-from klarlog import Klarlog
+from logsiegel import Logsiegel
 
 
 @pytest.fixture
 def lb(tmp_path):
-    lb = Klarlog.init(tmp_path / "log", origin="test")
+    lb = Logsiegel.init(tmp_path / "log", origin="test")
     lb.append("system_start", {"version": "0.1"})
     for i in range(5):
         lb.append(

@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "klarlog"
+name = "logsiegel"
 version = "0.1.0"
 description = "Tamper-evident, privacy-preserving event logs for AI systems (transparency-log style, no blockchain)"
 readme = "README.md"
@@ -17,7 +17,7 @@ dev = ["pytest>=8"]
 litellm = ["litellm"]
 
 [project.scripts]
-klarlog = "klarlog.cli:main"
+logsiegel = "logsiegel.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["klarlog*"]
+include = ["logsiegel*"]

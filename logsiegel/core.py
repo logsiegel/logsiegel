@@ -1,4 +1,4 @@
-"""Klarlog core: an append-only, tamper-evident event log for AI systems.
+"""Logsiegel core: an append-only, tamper-evident event log for AI systems.
 
 Design:
 - Entries are canonical-JSON lines in ``log.jsonl``; each entry carries the
@@ -81,14 +81,14 @@ class VerifyReport:
         self.problems.append(msg)
 
 
-class Klarlog:
+class Logsiegel:
     def __init__(self, directory: str | Path):
         self.dir = Path(directory)
 
     # -- setup -----------------------------------------------------------
 
     @classmethod
-    def init(cls, directory: str | Path, origin: str = "klarlog-poc") -> "Klarlog":
+    def init(cls, directory: str | Path, origin: str = "logsiegel-poc") -> "Logsiegel":
         lb = cls(directory)
         if (lb.dir / LOG_FILE).exists():
             raise FileExistsError(f"{lb.dir} already contains a log")
@@ -143,7 +143,7 @@ class Klarlog:
     def _last_entry_hash(self) -> str:
         lines = self._read_lines(LOG_FILE)
         if not lines:
-            return "sha256:" + hashlib.sha256(b"klarlog-genesis").hexdigest()
+            return "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
         return "sha256:" + hashlib.sha256(lines[-1]).hexdigest()
 
     def append(
@@ -221,7 +221,7 @@ class Klarlog:
         report = VerifyReport(ok=True, entries=len(lines), checkpoints=0)
 
         # 1. hash chain + sequence
-        prev = "sha256:" + hashlib.sha256(b"klarlog-genesis").hexdigest()
+        prev = "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
         for i, ln in enumerate(lines):
             try:
                 e = json.loads(ln)
@@ -314,7 +314,7 @@ class Klarlog:
         )
 
         lines = [
-            "# Klarlog record-keeping dossier",
+            "# Logsiegel record-keeping dossier",
             "",
             f"- Origin: `{self.origin}`",
             f"- Signing key: `{self.public_key_fingerprint()}`",

@@ -1,4 +1,4 @@
-"""Klarlog CLI: init, log, checkpoint, verify, export, shred, payload."""
+"""Logsiegel CLI: init, log, checkpoint, verify, export, shred, payload."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from .core import EVENT_TYPES, Klarlog
+from .core import EVENT_TYPES, Logsiegel
 
 
 def _attrs(pairs: list[str]) -> dict:
@@ -21,12 +21,12 @@ def _attrs(pairs: list[str]) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="klarlog", description="Tamper-evident event log for AI systems")
+    ap = argparse.ArgumentParser(prog="logsiegel", description="Tamper-evident event log for AI systems")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("init", help="create a new log")
     p.add_argument("dir")
-    p.add_argument("--origin", default="klarlog-poc")
+    p.add_argument("--origin", default="logsiegel-poc")
 
     p = sub.add_parser("log", help="append an event")
     p.add_argument("dir")
@@ -58,11 +58,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if args.cmd == "init":
-        lb = Klarlog.init(args.dir, origin=args.origin)
+        lb = Logsiegel.init(args.dir, origin=args.origin)
         print(f"initialized log in {args.dir} (origin={lb.origin}, key={lb.public_key_fingerprint()})")
         return 0
 
-    lb = Klarlog(args.dir)
+    lb = Logsiegel(args.dir)
 
     if args.cmd == "log":
         e = lb.append(args.event, _attrs(args.attr), args.input_text, args.output_text,
