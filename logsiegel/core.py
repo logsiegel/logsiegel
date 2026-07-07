@@ -82,8 +82,11 @@ class VerifyReport:
 
 
 class Logsiegel:
-    def __init__(self, directory: str | Path):
+    def __init__(self, directory: str | Path, event_types: tuple[str, ...] = EVENT_TYPES):
+        """`event_types` lets domain-specific writers bring their own taxonomy
+        (default: the AI lifecycle taxonomy above)."""
         self.dir = Path(directory)
+        self.event_types = event_types
 
     # -- setup -----------------------------------------------------------
 
@@ -155,8 +158,8 @@ class Logsiegel:
         store_payload: bool = False,
     ) -> dict:
         """Append one event. Only metadata and salted hashes enter the log."""
-        if event not in EVENT_TYPES:
-            raise ValueError(f"unknown event type {event!r}; expected one of {EVENT_TYPES}")
+        if event not in self.event_types:
+            raise ValueError(f"unknown event type {event!r}; expected one of {self.event_types}")
         seq = len(self._read_lines(LOG_FILE))
         salt = secrets.token_bytes(16)
 
@@ -326,14 +329,15 @@ class Logsiegel:
             lines.append(f"  - problem: {p}")
         lines += [
             "",
-            "## Events (Art. 12 taxonomy v0)",
+            "## Events",
             "",
             "| event | count |",
             "|---|---|",
         ]
-        for ev in EVENT_TYPES:
-            if ev in by_event:
-                lines.append(f"| {ev} | {by_event[ev]} |")
+        known = [ev for ev in self.event_types if ev in by_event]
+        extra = sorted(ev for ev in by_event if ev not in self.event_types)
+        for ev in known + extra:
+            lines.append(f"| {ev} | {by_event[ev]} |")
         lines += [
             "",
             "## Models observed",

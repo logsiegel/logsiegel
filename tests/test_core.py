@@ -82,7 +82,7 @@ def test_dossier_reports_state(lb):
     lb.shred(2)
     text = lb.export_dossier()
     assert "PASS" in text
-    assert "| inference | 5 |" in text
+    assert "| inference | 5 |" in text  # noqa: taxonomy table
     assert "Shredded entries: 1" in text
 
 
