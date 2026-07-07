@@ -1,8 +1,8 @@
-# Logbuch
+# Klarlog
 
 **Tamper-evident, privacy-preserving event logs for AI systems.**
 
-Observability tools show what happened — Logbuch makes it *provable*. It records
+Observability tools show what happened — Klarlog makes it *provable*. It records
 AI lifecycle events (inference, model changes, human overrides, …) into an
 append-only log with hash chaining and Ed25519-signed Merkle checkpoints — the
 same battle-tested construction as Certificate Transparency (RFC 6962).
@@ -15,7 +15,7 @@ department.
 ## Why
 
 - **Logs in ordinary databases are silently editable.** When an AI decision is
-  challenged, "our logs say X" proves nothing. Logbuch makes any after-the-fact
+  challenged, "our logs say X" proves nothing. Klarlog makes any after-the-fact
   modification, reordering or truncation cryptographically detectable — offline,
   by anyone holding a checkpoint.
 - **Privacy by design.** Only event metadata and salted payload hashes enter the
@@ -32,14 +32,14 @@ department.
 ```bash
 pip install -e .
 
-logbuch init ./mylog --origin "acme.example/support-bot"
-logbuch log ./mylog --event inference \
+klarlog init ./mylog --origin "acme.example/support-bot"
+klarlog log ./mylog --event inference \
   --attr gen_ai.request.model=gpt-5 --attr gen_ai.usage.input_tokens=412 \
   --input "customer question …" --output "answer …" --store-payload
-logbuch checkpoint ./mylog
-logbuch verify ./mylog          # PASS: hash chain + Merkle roots + signatures
-logbuch export ./mylog          # auditor-readable dossier (markdown)
-logbuch shred ./mylog --seq 1   # GDPR erasure; verify still passes
+klarlog checkpoint ./mylog
+klarlog verify ./mylog          # PASS: hash chain + Merkle roots + signatures
+klarlog export ./mylog          # auditor-readable dossier (markdown)
+klarlog shred ./mylog --seq 1   # GDPR erasure; verify still passes
 ```
 
 Full walkthrough incl. tamper detection: `python examples/demo.py`
@@ -48,9 +48,9 @@ Full walkthrough incl. tamper detection: `python examples/demo.py`
 
 ```python
 import litellm
-from logbuch.integrations.litellm_logger import LogbuchLogger
+from klarlog.integrations.litellm_logger import KlarlogLogger
 
-litellm.callbacks = [LogbuchLogger("/var/lib/logbuch/prod", store_payload=True)]
+litellm.callbacks = [KlarlogLogger("/var/lib/klarlog/prod", store_payload=True)]
 ```
 
 Every completion becomes a signed-committable `inference` event; failures are

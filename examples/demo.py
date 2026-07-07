@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from logbuch import Logbuch  # noqa: E402
+from klarlog import Klarlog  # noqa: E402
 
 WORK = Path(__file__).resolve().parent / "_demo_log"
 
@@ -20,7 +20,7 @@ def main():
         shutil.rmtree(WORK)
 
     print("== 1. init + record an AI session ==")
-    lb = Logbuch.init(WORK, origin="demo.example/hr-screening")
+    lb = Klarlog.init(WORK, origin="demo.example/hr-screening")
     lb.append("system_start", {"service.version": "2.3.1"})
     lb.append(
         "inference",

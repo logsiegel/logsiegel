@@ -3,9 +3,9 @@
 Usage (LiteLLM proxy or SDK):
 
     import litellm
-    from logbuch.integrations.litellm_logger import LogbuchLogger
+    from klarlog.integrations.litellm_logger import KlarlogLogger
 
-    litellm.callbacks = [LogbuchLogger("/var/lib/logbuch/prod")]
+    litellm.callbacks = [KlarlogLogger("/var/lib/klarlog/prod")]
 
 Only metadata and salted hashes enter the log; prompts/responses are stored
 encrypted (per-entry key, crypto-shreddable) when ``store_payload=True``.
@@ -15,7 +15,7 @@ Attribute names follow the OpenTelemetry GenAI semantic conventions.
 
 from __future__ import annotations
 
-from ..core import Logbuch
+from ..core import Klarlog
 
 try:
     from litellm.integrations.custom_logger import CustomLogger
@@ -33,9 +33,9 @@ def _text(messages) -> str:
         return str(messages)
 
 
-class LogbuchLogger(CustomLogger):
+class KlarlogLogger(CustomLogger):
     def __init__(self, log_dir: str, store_payload: bool = False):
-        self.lb = Logbuch(log_dir)
+        self.lb = Klarlog(log_dir)
         self.store_payload = store_payload
 
     def _record(self, kwargs, response_obj, start_time, end_time, error: str | None = None):

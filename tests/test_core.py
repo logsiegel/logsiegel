@@ -2,12 +2,12 @@ import json
 
 import pytest
 
-from logbuch import Logbuch
+from klarlog import Klarlog
 
 
 @pytest.fixture
 def lb(tmp_path):
-    lb = Logbuch.init(tmp_path / "log", origin="test")
+    lb = Klarlog.init(tmp_path / "log", origin="test")
     lb.append("system_start", {"version": "0.1"})
     for i in range(5):
         lb.append(
