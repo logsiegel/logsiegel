@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logbuch"
+version = "0.1.0"
+description = "Tamper-evident, privacy-preserving event logs for AI systems (transparency-log style, no blockchain)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "Stefan Böck" }]
+dependencies = ["cryptography>=42"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+litellm = ["litellm"]
+
+[project.scripts]
+logbuch = "logbuch.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["logbuch*"]
