@@ -3,4 +3,5 @@ __pycache__/
 .venv/
 .pytest_cache/
 examples/_demo_log/
+examples/_pii_demo_log/
 dist/

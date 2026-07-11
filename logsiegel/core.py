@@ -34,6 +34,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.exceptions import InvalidSignature
 
 from .merkle import leaf_hash, merkle_root
+from .pii import scrub
 
 LOG_FILE = "log.jsonl"
 CHECKPOINT_FILE = "checkpoints.jsonl"
@@ -82,11 +83,19 @@ class VerifyReport:
 
 
 class Logsiegel:
-    def __init__(self, directory: str | Path, event_types: tuple[str, ...] = EVENT_TYPES):
+    def __init__(
+        self,
+        directory: str | Path,
+        event_types: tuple[str, ...] = EVENT_TYPES,
+        pii_detector=None,
+    ):
         """`event_types` lets domain-specific writers bring their own taxonomy
-        (default: the AI lifecycle taxonomy above)."""
+        (default: the AI lifecycle taxonomy above). `pii_detector` (see
+        ``logsiegel.pii``) masks identifiers in stored payloads; the salted
+        hashes keep committing to the original text."""
         self.dir = Path(directory)
         self.event_types = event_types
+        self.pii_detector = pii_detector
 
     # -- setup -----------------------------------------------------------
 
@@ -171,10 +180,22 @@ class Logsiegel:
             "attrs": attrs or {},
             "prev": self._last_entry_hash(),
         }
+        # Hashes commit to the ORIGINAL text (evidential value); with a
+        # detector configured, only the masked copy is ever persisted.
+        stored_input, stored_output = input_text, output_text
         if input_text is not None:
             entry["input_hash"] = _salted_hash(salt, input_text)
         if output_text is not None:
             entry["output_hash"] = _salted_hash(salt, output_text)
+        if self.pii_detector is not None and (input_text is not None or output_text is not None):
+            pii: dict = {"detector": getattr(self.pii_detector, "id", "custom")}
+            if input_text is not None:
+                stored_input, counts = scrub(input_text, self.pii_detector.detect(input_text))
+                pii["input"] = counts
+            if output_text is not None:
+                stored_output, counts = scrub(output_text, self.pii_detector.detect(output_text))
+                pii["output"] = counts
+            entry["pii"] = pii
 
         needs_key = input_text is not None or output_text is not None
         if needs_key:
@@ -184,7 +205,7 @@ class Logsiegel:
             (self.dir / PAYLOAD_KEYS_FILE).write_text(json.dumps(keys, indent=1))
             if store_payload:
                 nonce = secrets.token_bytes(12)
-                blob = canonical({"input": input_text, "output": output_text})
+                blob = canonical({"input": stored_input, "output": stored_output})
                 enc = AESGCM(payload_key).encrypt(nonce, blob, None)
                 ref = f"{PAYLOAD_DIR}/{seq:08d}.enc"
                 (self.dir / ref).write_bytes(nonce + enc)
@@ -349,6 +370,36 @@ class Logsiegel:
             "The log contains event metadata and salted payload hashes only; "
             "raw contents are stored separately under per-entry keys "
             f"(crypto-shredding). Shredded entries: {shredded}.",
+        ]
+
+        pii_counts: dict[str, int] = {}
+        pii_detectors: set[str] = set()
+        pii_entries = 0
+        for e in entries:
+            p = e.get("pii")
+            if not p:
+                continue
+            pii_entries += 1
+            pii_detectors.add(p.get("detector", "custom"))
+            for side in ("input", "output"):
+                for kind, n in p.get(side, {}).items():
+                    pii_counts[kind] = pii_counts.get(kind, 0) + n
+        if pii_entries:
+            lines += [
+                "",
+                "## PII scrubbing",
+                "",
+                f"Detector(s): {', '.join(sorted(pii_detectors))} — active on "
+                f"{pii_entries} entries. Stored payloads hold masked copies; "
+                "salted hashes commit to the original text.",
+                "",
+                "| identifier kind | masked |",
+                "|---|---|",
+            ]
+            for kind in sorted(pii_counts):
+                lines.append(f"| {kind} | {pii_counts[kind]} |")
+
+        lines += [
             "",
             "## Retention",
             "",

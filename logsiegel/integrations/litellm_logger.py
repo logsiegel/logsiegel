@@ -34,8 +34,8 @@ def _text(messages) -> str:
 
 
 class LogsiegelLogger(CustomLogger):
-    def __init__(self, log_dir: str, store_payload: bool = False):
-        self.lb = Logsiegel(log_dir)
+    def __init__(self, log_dir: str, store_payload: bool = False, pii_detector=None):
+        self.lb = Logsiegel(log_dir, pii_detector=pii_detector)
         self.store_payload = store_payload
 
     def _record(self, kwargs, response_obj, start_time, end_time, error: str | None = None):

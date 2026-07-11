@@ -36,6 +36,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--output", dest="output_text")
     p.add_argument("--store-payload", action="store_true",
                    help="store encrypted payload alongside the log (crypto-shreddable)")
+    p.add_argument("--pii", action="store_true",
+                   help="mask identifiers (email/phone/IBAN) in the stored payload; "
+                        "hashes still commit to the original")
 
     p = sub.add_parser("checkpoint", help="sign a checkpoint over the current log")
     p.add_argument("dir")
@@ -65,6 +68,9 @@ def main(argv: list[str] | None = None) -> int:
     lb = Logsiegel(args.dir)
 
     if args.cmd == "log":
+        if args.pii:
+            from .pii import RegexDetector
+            lb.pii_detector = RegexDetector()
         e = lb.append(args.event, _attrs(args.attr), args.input_text, args.output_text,
                       store_payload=args.store_payload)
         print(json.dumps(e, ensure_ascii=False))
