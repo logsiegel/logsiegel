@@ -12,7 +12,9 @@ Design:
   ("crypto-shredding") destroys the content *and* the linkability of the
   salted hash, while the log remains fully verifiable.
 
-This is a proof of concept: single-writer, local filesystem, no locking.
+This is a proof of concept: local filesystem, one log directory per writer.
+Appends are serialized with an exclusive file lock and fsynced before they
+are acknowledged — an event counts as recorded only once it is durable.
 """
 
 from __future__ import annotations
@@ -21,6 +23,11 @@ import json
 import os
 import secrets
 import hashlib
+
+try:
+    import fcntl
+except ImportError:  # non-POSIX platform: no advisory locking
+    fcntl = None
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,7 +40,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.exceptions import InvalidSignature
 
-from .merkle import leaf_hash, merkle_root
+from .merkle import inclusion_proof, leaf_hash, merkle_root, verify_inclusion
 from .pii import scrub
 
 LOG_FILE = "log.jsonl"
@@ -42,6 +49,8 @@ KEY_FILE = "keys/signing_key.pem"
 PUB_FILE = "keys/signing_key.pub"
 PAYLOAD_DIR = "payloads"
 PAYLOAD_KEYS_FILE = "keys/payload_keys.json"
+
+GENESIS = "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
 
 # Minimal v0 event taxonomy for the AI system lifecycle (Art. 12 orientation).
 EVENT_TYPES = (
@@ -82,6 +91,39 @@ class VerifyReport:
         self.problems.append(msg)
 
 
+def verify_receipt(receipt: dict, public_key: Ed25519PublicKey) -> VerifyReport:
+    """Verify a standalone receipt (see :meth:`Logsiegel.receipt`) offline.
+
+    Needs only the receipt and the log's public key — obtain the key
+    out-of-band, not from whoever produced the receipt."""
+    report = VerifyReport(ok=True, entries=1, checkpoints=1)
+    cp = receipt.get("checkpoint") or {}
+    try:
+        body = {k: cp[k] for k in ("origin", "size", "root", "ts")}
+        public_key.verify(bytes.fromhex(cp["sig"]), canonical(body))
+    except (InvalidSignature, KeyError, ValueError):
+        report.fail("checkpoint signature invalid")
+        return report
+    if cp["origin"] != receipt.get("origin"):
+        report.fail("origin mismatch between receipt and checkpoint")
+    entry = receipt.get("entry")
+    seq = receipt.get("seq")
+    if not isinstance(entry, dict) or entry.get("seq") != seq:
+        report.fail("entry/seq mismatch in receipt")
+        return report
+    try:
+        proof = [bytes.fromhex(p) for p in receipt.get("inclusion_proof", [])]
+        included = verify_inclusion(
+            leaf_hash(canonical(entry)), seq, cp["size"], proof, bytes.fromhex(cp["root"])
+        )
+    except (KeyError, ValueError, TypeError):
+        included = False
+    if not included:
+        report.fail(f"inclusion proof invalid for entry {seq}")
+    report.first_ts = report.last_ts = entry.get("ts")
+    return report
+
+
 class Logsiegel:
     def __init__(
         self,
@@ -96,6 +138,7 @@ class Logsiegel:
         self.dir = Path(directory)
         self.event_types = event_types
         self.pii_detector = pii_detector
+        self._tail: tuple[int, int, str] | None = None  # (byte size, entries, last hash)
 
     # -- setup -----------------------------------------------------------
 
@@ -115,6 +158,7 @@ class Logsiegel:
                 serialization.NoEncryption(),
             )
         )
+        os.chmod(lb.dir / KEY_FILE, 0o600)
         (lb.dir / PUB_FILE).write_bytes(
             key.public_key().public_bytes(
                 serialization.Encoding.PEM,
@@ -152,11 +196,21 @@ class Logsiegel:
     def entries(self) -> list[dict]:
         return [json.loads(ln) for ln in self._read_lines(LOG_FILE)]
 
-    def _last_entry_hash(self) -> str:
+    def _tail_state(self) -> tuple[int, int, str]:
+        """(byte size, entry count, last entry hash) — O(1) while the file is
+        unchanged; re-read from disk when another writer grew it."""
+        size = (self.dir / LOG_FILE).stat().st_size
+        if self._tail is not None and self._tail[0] == size:
+            return self._tail
         lines = self._read_lines(LOG_FILE)
-        if not lines:
-            return "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
-        return "sha256:" + hashlib.sha256(lines[-1]).hexdigest()
+        last = "sha256:" + hashlib.sha256(lines[-1]).hexdigest() if lines else GENESIS
+        self._tail = (size, len(lines), last)
+        return self._tail
+
+    def _write_keys(self, keys: dict) -> None:
+        tmp = self.dir / (PAYLOAD_KEYS_FILE + ".tmp")
+        tmp.write_text(json.dumps(keys, indent=1))
+        os.replace(tmp, self.dir / PAYLOAD_KEYS_FILE)
 
     def append(
         self,
@@ -166,53 +220,66 @@ class Logsiegel:
         output_text: str | None = None,
         store_payload: bool = False,
     ) -> dict:
-        """Append one event. Only metadata and salted hashes enter the log."""
+        """Append one event. Only metadata and salted hashes enter the log.
+
+        The append is serialized under an exclusive lock on the log file and
+        fsynced before returning: evidence is either durable or the caller
+        sees the failure — never silently lost to a crash.
+        """
         if event not in self.event_types:
             raise ValueError(f"unknown event type {event!r}; expected one of {self.event_types}")
-        seq = len(self._read_lines(LOG_FILE))
         salt = secrets.token_bytes(16)
 
-        entry: dict = {
-            "v": 0,
-            "seq": seq,
-            "ts": _now(),
-            "event": event,
-            "attrs": attrs or {},
-            "prev": self._last_entry_hash(),
-        }
-        # Hashes commit to the ORIGINAL text (evidential value); with a
-        # detector configured, only the masked copy is ever persisted.
-        stored_input, stored_output = input_text, output_text
-        if input_text is not None:
-            entry["input_hash"] = _salted_hash(salt, input_text)
-        if output_text is not None:
-            entry["output_hash"] = _salted_hash(salt, output_text)
-        if self.pii_detector is not None and (input_text is not None or output_text is not None):
-            pii: dict = {"detector": getattr(self.pii_detector, "id", "custom")}
+        with (self.dir / LOG_FILE).open("a+b") as f:
+            if fcntl is not None:
+                fcntl.flock(f, fcntl.LOCK_EX)
+            size, seq, prev = self._tail_state()
+
+            entry: dict = {
+                "v": 0,
+                "seq": seq,
+                "ts": _now(),
+                "event": event,
+                "attrs": attrs or {},
+                "prev": prev,
+            }
+            # Hashes commit to the ORIGINAL text (evidential value); with a
+            # detector configured, only the masked copy is ever persisted.
+            stored_input, stored_output = input_text, output_text
             if input_text is not None:
-                stored_input, counts = scrub(input_text, self.pii_detector.detect(input_text))
-                pii["input"] = counts
+                entry["input_hash"] = _salted_hash(salt, input_text)
             if output_text is not None:
-                stored_output, counts = scrub(output_text, self.pii_detector.detect(output_text))
-                pii["output"] = counts
-            entry["pii"] = pii
+                entry["output_hash"] = _salted_hash(salt, output_text)
+            if self.pii_detector is not None and (input_text is not None or output_text is not None):
+                pii: dict = {"detector": getattr(self.pii_detector, "id", "custom")}
+                if input_text is not None:
+                    stored_input, counts = scrub(input_text, self.pii_detector.detect(input_text))
+                    pii["input"] = counts
+                if output_text is not None:
+                    stored_output, counts = scrub(output_text, self.pii_detector.detect(output_text))
+                    pii["output"] = counts
+                entry["pii"] = pii
 
-        needs_key = input_text is not None or output_text is not None
-        if needs_key:
-            payload_key = AESGCM.generate_key(bit_length=256)
-            keys = json.loads((self.dir / PAYLOAD_KEYS_FILE).read_text())
-            keys[str(seq)] = {"salt": salt.hex(), "key": payload_key.hex()}
-            (self.dir / PAYLOAD_KEYS_FILE).write_text(json.dumps(keys, indent=1))
-            if store_payload:
-                nonce = secrets.token_bytes(12)
-                blob = canonical({"input": stored_input, "output": stored_output})
-                enc = AESGCM(payload_key).encrypt(nonce, blob, None)
-                ref = f"{PAYLOAD_DIR}/{seq:08d}.enc"
-                (self.dir / ref).write_bytes(nonce + enc)
-                entry["payload_ref"] = ref
+            needs_key = input_text is not None or output_text is not None
+            if needs_key:
+                payload_key = AESGCM.generate_key(bit_length=256)
+                keys = json.loads((self.dir / PAYLOAD_KEYS_FILE).read_text())
+                keys[str(seq)] = {"salt": salt.hex(), "key": payload_key.hex()}
+                self._write_keys(keys)
+                if store_payload:
+                    nonce = secrets.token_bytes(12)
+                    blob = canonical({"input": stored_input, "output": stored_output})
+                    enc = AESGCM(payload_key).encrypt(nonce, blob, None)
+                    ref = f"{PAYLOAD_DIR}/{seq:08d}.enc"
+                    (self.dir / ref).write_bytes(nonce + enc)
+                    entry["payload_ref"] = ref
 
-        with (self.dir / LOG_FILE).open("ab") as f:
-            f.write(canonical(entry) + b"\n")
+            data = canonical(entry) + b"\n"
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+            self._tail = (size + len(data), seq + 1,
+                          "sha256:" + hashlib.sha256(data[:-1]).hexdigest())
         return entry
 
     # -- checkpoints -----------------------------------------------------
@@ -231,7 +298,11 @@ class Logsiegel:
         sig = self._private_key().sign(canonical(body))
         cp = {**body, "sig": sig.hex()}
         with (self.dir / CHECKPOINT_FILE).open("ab") as f:
+            if fcntl is not None:
+                fcntl.flock(f, fcntl.LOCK_EX)
             f.write(canonical(cp) + b"\n")
+            f.flush()
+            os.fsync(f.fileno())
         return cp
 
     def checkpoints(self) -> list[dict]:
@@ -239,13 +310,19 @@ class Logsiegel:
 
     # -- verification ----------------------------------------------------
 
-    def verify(self) -> VerifyReport:
-        """Offline verification: hash chain, Merkle roots, signatures."""
+    def verify(self, public_key: Ed25519PublicKey | None = None) -> VerifyReport:
+        """Offline verification: hash chain, Merkle roots, signatures.
+
+        Pass ``public_key`` to verify against an out-of-band copy of the
+        log's key (trust anchor) instead of the one stored next to the log —
+        the stored copy proves nothing against whoever controls the log
+        directory.
+        """
         lines = self._read_lines(LOG_FILE)
         report = VerifyReport(ok=True, entries=len(lines), checkpoints=0)
 
         # 1. hash chain + sequence
-        prev = "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
+        prev = GENESIS
         for i, ln in enumerate(lines):
             try:
                 e = json.loads(ln)
@@ -264,7 +341,7 @@ class Logsiegel:
             report.last_ts = json.loads(lines[-1]).get("ts")
 
         # 2. checkpoints: signature + committed root + monotonic size
-        pub = self.public_key()
+        pub = public_key or self.public_key()
         last_size = 0
         for j, cp in enumerate(self.checkpoints()):
             report.checkpoints += 1
@@ -290,6 +367,32 @@ class Logsiegel:
 
         return report
 
+    # -- receipts --------------------------------------------------------
+
+    def receipt(self, seq: int) -> dict:
+        """Standalone proof for one entry: the entry itself, an RFC 6962
+        inclusion proof, and the latest signed checkpoint covering it.
+
+        Verifiable with :func:`verify_receipt` and the log's public key
+        alone — the verifier needs no access to the full log or the
+        operator's infrastructure."""
+        lines = self._read_lines(LOG_FILE)
+        if not 0 <= seq < len(lines):
+            raise IndexError(f"no entry {seq} (log has {len(lines)})")
+        covering = [cp for cp in self.checkpoints() if cp["size"] > seq]
+        if not covering:
+            raise ValueError(f"no checkpoint covers entry {seq} yet — run checkpoint first")
+        cp = covering[-1]
+        leaves = [leaf_hash(ln) for ln in lines[: cp["size"]]]
+        return {
+            "v": 0,
+            "origin": self.origin,
+            "seq": seq,
+            "entry": json.loads(lines[seq]),
+            "inclusion_proof": [p.hex() for p in inclusion_proof(leaves, seq)],
+            "checkpoint": cp,
+        }
+
     # -- privacy ---------------------------------------------------------
 
     def read_payload(self, seq: int) -> dict:
@@ -312,7 +415,7 @@ class Logsiegel:
         if str(seq) not in keys:
             raise KeyError(f"no payload key for entry {seq}")
         del keys[str(seq)]
-        (self.dir / PAYLOAD_KEYS_FILE).write_text(json.dumps(keys, indent=1))
+        self._write_keys(keys)
         ref = self.entries()[seq].get("payload_ref")
         if ref and (self.dir / ref).exists():
             os.remove(self.dir / ref)

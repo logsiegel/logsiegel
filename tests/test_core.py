@@ -89,3 +89,52 @@ def test_dossier_reports_state(lb):
 def test_unknown_event_rejected(lb):
     with pytest.raises(ValueError):
         lb.append("compliance_theatre")
+
+
+def test_receipt_verifies_standalone(lb):
+    from logsiegel import verify_receipt
+
+    rec = lb.receipt(3)
+    r = verify_receipt(rec, lb.public_key())
+    assert r.ok, r.problems
+
+
+def test_receipt_forgery_detected(lb):
+    from logsiegel import verify_receipt
+
+    rec = lb.receipt(3)
+    rec["entry"]["attrs"]["gen_ai.usage.input_tokens"] = 999
+    assert not verify_receipt(rec, lb.public_key()).ok
+
+
+def test_receipt_wrong_key_detected(lb, tmp_path):
+    from logsiegel import Logsiegel, verify_receipt
+
+    other = Logsiegel.init(tmp_path / "other", origin="test")
+    assert not verify_receipt(lb.receipt(0), other.public_key()).ok
+
+
+def test_receipt_requires_covering_checkpoint(lb):
+    lb.append("system_stop")  # not yet checkpointed
+    with pytest.raises(ValueError):
+        lb.receipt(7)
+
+
+def test_second_writer_instance_stays_consistent(lb):
+    from logsiegel import Logsiegel
+
+    lb2 = Logsiegel(lb.dir)
+    lb2.append("system_stop")
+    lb.append("system_start")  # first instance must pick up the new tail
+    r = lb.verify()
+    assert r.ok, r.problems
+    assert r.entries == 9
+
+
+def test_verify_with_external_pubkey(lb, tmp_path):
+    from logsiegel import Logsiegel
+
+    assert lb.verify(public_key=lb.public_key()).ok
+    other = Logsiegel.init(tmp_path / "other", origin="test")
+    r = lb.verify(public_key=other.public_key())
+    assert not r.ok  # wrong trust anchor → signatures must not check out

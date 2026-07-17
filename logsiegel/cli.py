@@ -1,4 +1,4 @@
-"""Logsiegel CLI: init, log, checkpoint, verify, export, shred, payload."""
+"""Logsiegel CLI: init, log, checkpoint, verify, receipt, export, shred, payload."""
 
 from __future__ import annotations
 
@@ -7,7 +7,9 @@ import json
 import sys
 from pathlib import Path
 
-from .core import EVENT_TYPES, Logsiegel
+from cryptography.hazmat.primitives import serialization
+
+from .core import EVENT_TYPES, Logsiegel, verify_receipt
 
 
 def _attrs(pairs: list[str]) -> dict:
@@ -45,6 +47,18 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("verify", help="verify hash chain, Merkle roots and signatures")
     p.add_argument("dir")
+    p.add_argument("--pubkey", help="PEM public key obtained out-of-band (trust anchor); "
+                                    "default: the copy stored next to the log")
+
+    p = sub.add_parser("receipt", help="export a standalone proof for one entry")
+    p.add_argument("dir")
+    p.add_argument("--seq", type=int, required=True)
+    p.add_argument("--out", default="-")
+
+    p = sub.add_parser("verify-receipt",
+                       help="verify a receipt offline — needs only the receipt and the public key")
+    p.add_argument("receipt")
+    p.add_argument("--pubkey", required=True, help="PEM public key of the log")
 
     p = sub.add_parser("export", help="write auditor-readable dossier (markdown)")
     p.add_argument("dir")
@@ -59,6 +73,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seq", type=int, required=True)
 
     args = ap.parse_args(argv)
+
+    if args.cmd == "verify-receipt":
+        rec = json.loads(Path(args.receipt).read_text())
+        pub = serialization.load_pem_public_key(Path(args.pubkey).read_bytes())
+        r = verify_receipt(rec, pub)
+        status = "PASS" if r.ok else "FAIL"
+        print(f"{status}: entry {rec.get('seq')} of origin {rec.get('origin')!r}")
+        for prob in r.problems:
+            print(f"  ✗ {prob}")
+        return 0 if r.ok else 1
 
     if args.cmd == "init":
         lb = Logsiegel.init(args.dir, origin=args.origin)
@@ -82,12 +106,25 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.cmd == "verify":
-        r = lb.verify()
+        pub = None
+        if args.pubkey:
+            pub = serialization.load_pem_public_key(Path(args.pubkey).read_bytes())
+        r = lb.verify(public_key=pub)
         status = "PASS" if r.ok else "FAIL"
         print(f"{status}: {r.entries} entries, {r.checkpoints} checkpoints")
         for prob in r.problems:
             print(f"  ✗ {prob}")
         return 0 if r.ok else 1
+
+    if args.cmd == "receipt":
+        rec = lb.receipt(args.seq)
+        text = json.dumps(rec, ensure_ascii=False, indent=1)
+        if args.out == "-":
+            print(text)
+        else:
+            Path(args.out).write_text(text)
+            print(f"receipt for entry {args.seq} written to {args.out}")
+        return 0
 
     if args.cmd == "export":
         text = lb.export_dossier()
