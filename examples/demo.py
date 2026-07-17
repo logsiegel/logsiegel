@@ -1,4 +1,7 @@
-"""End-to-end demo: log an AI session, checkpoint, tamper, detect, shred, export.
+"""End-to-end demo: a public-administration assistant prepares a decision,
+every step lands in a tamper-evident trail; a citizen (or ombuds office)
+verifies a single receipt offline; then tampering, GDPR crypto-shredding
+and the auditor dossier.
 
 Run:  python examples/demo.py
 """
@@ -10,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from logsiegel import Logsiegel  # noqa: E402
+from logsiegel import Logsiegel, verify_receipt  # noqa: E402
 
 WORK = Path(__file__).resolve().parent / "_demo_log"
 
@@ -19,21 +22,19 @@ def main():
     if WORK.exists():
         shutil.rmtree(WORK)
 
-    print("== 1. init + record an AI session ==")
-    lb = Logsiegel.init(WORK, origin="demo.example/hr-screening")
+    print("== 1. init + record an assistant session (public-sector case) ==")
+    lb = Logsiegel.init(WORK, origin="stadt.example/buergerservice-assistent")
     lb.append("system_start", {"service.version": "2.3.1"})
     lb.append(
         "inference",
         {"gen_ai.system": "openai", "gen_ai.request.model": "gpt-5",
          "gen_ai.usage.input_tokens": 412, "gen_ai.usage.output_tokens": 88},
-        input_text="Bewerber Max Mustermann, geb. 12.03.1990, bitte bewerten …",
-        output_text="Empfehlung: zur zweiten Runde einladen.",
+        input_text="Anfrage von Anna Muster: Zweitausfertigung der Wohnsitzbestätigung …",
+        output_text="Entwurf: Bestätigung wird ausgestellt; Gebühr CHF 20 gemäss Tarif 4.2.",
         store_payload=True,
     )
     lb.append("human_override",
-              {"actor": "recruiter-7", "reason": "manual re-ranking"})
-    lb.append("model_change",
-              {"gen_ai.request.model": "gpt-5-mini", "reason": "cost policy"})
+              {"actor": "sachbearbeiterin-12", "reason": "Entwurf geprüft und freigegeben"})
     cp = lb.checkpoint()
     print(f"  {len(lb.entries())} events, checkpoint root {cp['root'][:16]}…")
 
@@ -41,7 +42,13 @@ def main():
     r = lb.verify()
     print(f"  {'PASS' if r.ok else 'FAIL'}")
 
-    print("\n== 3. tamper: forge the human_override actor after the fact ==")
+    print("\n== 3. receipt: the citizen verifies ONE entry offline ==")
+    rec = lb.receipt(2)  # the human approval
+    ok = verify_receipt(rec, lb.public_key()).ok
+    print(f"  receipt for entry 2 (human approval): {'PASS' if ok else 'FAIL'} "
+          "— no access to the full log needed")
+
+    print("\n== 4. tamper: forge the approving actor after the fact ==")
     log = WORK / "log.jsonl"
     lines = log.read_bytes().splitlines(keepends=True)
     e = json.loads(lines[2])
@@ -53,7 +60,7 @@ def main():
     print(f"  {'PASS' if r.ok else 'FAIL'} — {r.problems[0] if r.problems else ''}")
     log.write_bytes(backup)
 
-    print("\n== 4. GDPR: crypto-shred the applicant's payload, log stays valid ==")
+    print("\n== 5. GDPR: crypto-shred the citizen's payload, log stays valid ==")
     print(f"  payload before: {lb.read_payload(1)['input'][:45]}…")
     lb.shred(1)
     try:
@@ -62,7 +69,7 @@ def main():
         print(f"  payload after:  {exc}")
     print(f"  verify: {'PASS' if lb.verify().ok else 'FAIL'} (log unchanged, content gone)")
 
-    print("\n== 5. auditor dossier ==")
+    print("\n== 6. auditor dossier ==")
     print("  " + "\n  ".join(lb.export_dossier().splitlines()[:12]))
 
 
