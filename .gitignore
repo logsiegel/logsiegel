@@ -5,3 +5,4 @@ __pycache__/
 examples/_demo_log/
 examples/_pii_demo_log/
 dist/
+.DS_Store
