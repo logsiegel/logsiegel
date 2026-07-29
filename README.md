@@ -1,6 +1,6 @@
 # Logsiegel
 
-[![ci](https://github.com/stefanboeck/logsiegel/actions/workflows/ci.yml/badge.svg)](https://github.com/stefanboeck/logsiegel/actions/workflows/ci.yml)
+[![ci](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml/badge.svg)](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml)
 
 **Tamper-evident, privacy-preserving event logs for AI systems.**
 
