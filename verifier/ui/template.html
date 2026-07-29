@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Logsiegel Verifier</title>
+<style>
+  :root {
+    --fg: #1f2937; --muted: #6b7280; --bg: #f9fafb; --card: #ffffff;
+    --border: #e5e7eb; --ok: #15803d; --ok-bg: #f0fdf4; --fail: #b91c1c;
+    --fail-bg: #fef2f2; --accent: #374151;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #e5e7eb; --muted: #9ca3af; --bg: #111827; --card: #1f2937;
+      --border: #374151; --ok: #4ade80; --ok-bg: #052e16; --fail: #f87171;
+      --fail-bg: #450a0a; --accent: #d1d5db;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 1.5rem 1rem 3rem; background: var(--bg); color: var(--fg);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 42rem; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  h1 { font-size: 1.35rem; margin: 0 0 .25rem; }
+  .lang button {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    border-radius: .375rem; padding: .15rem .5rem; cursor: pointer; font-size: .8rem;
+  }
+  .lang button[aria-pressed="true"] { color: var(--fg); border-color: var(--accent); }
+  p.tagline { color: var(--muted); margin: 0 0 1.25rem; font-size: .95rem; }
+  .zones { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  @media (max-width: 34rem) { .zones { grid-template-columns: 1fr; } }
+  .zone {
+    background: var(--card); border: 1.5px dashed var(--border); border-radius: .5rem;
+    padding: 1rem; text-align: center; cursor: pointer; transition: border-color .15s;
+  }
+  .zone.dragover { border-color: var(--accent); }
+  .zone.filled { border-style: solid; border-color: var(--ok); }
+  .zone h2 { font-size: .95rem; margin: 0 0 .3rem; }
+  .zone .hint { color: var(--muted); font-size: .8rem; margin: 0; }
+  .zone .state { font-size: .85rem; margin: .4rem 0 0; word-break: break-all; }
+  .keyhint { color: var(--muted); font-size: .8rem; margin: .6rem 0 0; }
+  #verdict { margin-top: 1.25rem; border-radius: .5rem; padding: 1rem 1.25rem; display: none; }
+  #verdict.ok { display: block; background: var(--ok-bg); border: 1px solid var(--ok); }
+  #verdict.fail { display: block; background: var(--fail-bg); border: 1px solid var(--fail); }
+  #verdict .headline { font-size: 1.15rem; font-weight: 700; margin: 0; }
+  #verdict.ok .headline { color: var(--ok); }
+  #verdict.fail .headline { color: var(--fail); }
+  #verdict .explain { margin: .35rem 0 0; font-size: .92rem; }
+  ul.stages { list-style: none; padding: 0; margin: .75rem 0 0; font-size: .92rem; }
+  ul.stages li { margin: .15rem 0; }
+  table.details { width: 100%; border-collapse: collapse; margin-top: .75rem; font-size: .88rem; }
+  table.details td { padding: .25rem .5rem .25rem 0; vertical-align: top; }
+  table.details td:first-child { color: var(--muted); white-space: nowrap; width: 11rem; }
+  table.details td:last-child { font-family: ui-monospace, monospace; word-break: break-all; }
+  button.reset {
+    margin-top: 1rem; background: none; border: 1px solid var(--border); color: var(--muted);
+    border-radius: .375rem; padding: .3rem .8rem; cursor: pointer; display: none;
+  }
+  footer { margin-top: 2rem; color: var(--muted); font-size: .8rem; }
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Logsiegel Verifier</h1>
+    </div>
+    <div class="lang">
+      <button id="lang-de" aria-pressed="true">DE</button>
+      <button id="lang-en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+  <p class="tagline" data-i18n="tagline"></p>
+
+  <div class="zones">
+    <div class="zone" id="zone-receipt" tabindex="0">
+      <h2 data-i18n="receiptTitle"></h2>
+      <p class="hint" data-i18n="receiptHint"></p>
+      <p class="state" id="state-receipt"></p>
+      <input type="file" id="file-receipt" accept=".json,application/json">
+    </div>
+    <div class="zone" id="zone-key" tabindex="0">
+      <h2 data-i18n="keyTitle"></h2>
+      <p class="hint" data-i18n="keyHint"></p>
+      <p class="state" id="state-key"></p>
+      <input type="file" id="file-key">
+    </div>
+  </div>
+  <p class="keyhint" data-i18n="keyTrust"></p>
+
+  <section id="verdict" aria-live="polite">
+    <p class="headline" id="verdict-headline"></p>
+    <p class="explain" id="verdict-explain"></p>
+    <ul class="stages" id="verdict-stages"></ul>
+    <table class="details" id="verdict-details"></table>
+  </section>
+  <button class="reset" id="reset" data-i18n="reset"></button>
+
+  <footer>
+    <span data-i18n="footer"></span>
+  </footer>
+</main>
+
+<script type="module">
+// ---- verification library (bundled from verifier/src/*.mjs — do not edit here) ----
+// %BUNDLE%
+// ---- UI ----------------------------------------------------------------------
+
+const I18N = {
+  de: {
+    tagline: "Prüft einen Logsiegel-Beleg (Receipt) — vollständig lokal in Ihrem Browser. Nichts verlässt dieses Gerät; die Prüfung funktioniert auch ohne Internet.",
+    receiptTitle: "Beleg (receipt.json)",
+    receiptHint: "Datei hierher ziehen, klicken oder Inhalt einfügen",
+    keyTitle: "Öffentlicher Schlüssel",
+    keyHint: "PEM-Datei (signing_key.pub) hierher ziehen, klicken oder einfügen",
+    keyTrust: "Wichtig: Beziehen Sie den öffentlichen Schlüssel unabhängig von demjenigen, der Ihnen den Beleg gegeben hat — sonst prüfen Sie nur, ob der Absender mit sich selbst übereinstimmt.",
+    loaded: "geladen",
+    valid: "BELEG GÜLTIG",
+    invalid: "BELEG UNGÜLTIG",
+    explainOk: "Der Eintrag ist Teil des beurkundeten Logs, und der Prüfpunkt trägt eine gültige Signatur zum angegebenen Schlüssel.",
+    explainStructure: "Der Beleg ist beschädigt oder unvollständig — er hat nicht die erwartete Form.",
+    explainSignature: "Die Signatur des Prüfpunkts passt nicht zum öffentlichen Schlüssel. Dieser Prüfpunkt stammt nicht vom Inhaber dieses Schlüssels — oder wurde nachträglich verändert.",
+    explainInclusion: "Der Eintrag ist nicht Teil des Logs, auf das sich der signierte Prüfpunkt festlegt — der Inhalt wurde verändert oder der Beleg ist gefälscht.",
+    stageStructure: "Struktur",
+    stageSignature: "Signatur",
+    stageInclusion: "Aufnahme im Log",
+    stageSkipped: "übersprungen",
+    dOrigin: "Herkunft (origin)",
+    dSeq: "Eintrag Nr.",
+    dEvent: "Ereignis",
+    dTs: "Zeitstempel Eintrag",
+    dCp: "Prüfpunkt",
+    dCpValue: (size, ts) => `über ${size} Einträge, signiert ${ts}`,
+    dKey: "Schlüssel-Fingerprint",
+    errReceiptJson: "Der Beleg ist kein gültiges JSON.",
+    errKey: "Der öffentliche Schlüssel konnte nicht gelesen werden: ",
+    reset: "Zurücksetzen",
+    footer: "Logsiegel — manipulationserkennbare Handlungsprotokolle für KI-Systeme. Diese Datei können Sie archivieren und offline verwenden.",
+  },
+  en: {
+    tagline: "Verifies a Logsiegel receipt — entirely locally in your browser. Nothing leaves this device; verification works without internet access.",
+    receiptTitle: "Receipt (receipt.json)",
+    receiptHint: "Drop the file here, click, or paste its content",
+    keyTitle: "Public key",
+    keyHint: "Drop the PEM file (signing_key.pub) here, click, or paste",
+    keyTrust: "Important: obtain the public key independently of whoever handed you the receipt — otherwise you only check that the sender agrees with themselves.",
+    loaded: "loaded",
+    valid: "RECEIPT VALID",
+    invalid: "RECEIPT INVALID",
+    explainOk: "The entry is part of the attested log, and the checkpoint carries a valid signature under the given key.",
+    explainStructure: "The receipt is damaged or incomplete — it does not have the expected shape.",
+    explainSignature: "The checkpoint signature does not match the public key. This checkpoint was not issued by the holder of this key — or was modified afterwards.",
+    explainInclusion: "The entry is not part of the log the signed checkpoint commits to — the content was changed or the receipt is forged.",
+    stageStructure: "Structure",
+    stageSignature: "Signature",
+    stageInclusion: "Log inclusion",
+    stageSkipped: "skipped",
+    dOrigin: "Origin",
+    dSeq: "Entry no.",
+    dEvent: "Event",
+    dTs: "Entry timestamp",
+    dCp: "Checkpoint",
+    dCpValue: (size, ts) => `over ${size} entries, signed ${ts}`,
+    dKey: "Key fingerprint",
+    errReceiptJson: "The receipt is not valid JSON.",
+    errKey: "The public key could not be read: ",
+    reset: "Reset",
+    footer: "Logsiegel — tamper-evident action trails for AI systems. You can archive this file and use it offline.",
+  },
+};
+
+let lang = navigator.language && navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
+let receiptText = null;
+let keyText = null;
+
+const $ = (id) => document.getElementById(id);
+const t = (k) => I18N[lang][k];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  $("lang-de").setAttribute("aria-pressed", String(lang === "de"));
+  $("lang-en").setAttribute("aria-pressed", String(lang === "en"));
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  updateZoneStates();
+  run();
+}
+
+function updateZoneStates() {
+  $("state-receipt").textContent = receiptText ? "✓ " + t("loaded") : "";
+  $("zone-receipt").classList.toggle("filled", !!receiptText);
+  $("state-key").textContent = keyText ? "✓ " + t("loaded") : "";
+  $("zone-key").classList.toggle("filled", !!keyText);
+}
+
+function looksLikeKey(text) {
+  return text.includes("BEGIN PUBLIC KEY") ||
+    /^[A-Za-z0-9+/=\s]{40,80}$/.test(text.trim()) && !text.trim().startsWith("{");
+}
+
+function accept(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return;
+  if (looksLikeKey(trimmed)) keyText = trimmed;
+  else receiptText = trimmed;
+  updateZoneStates();
+  run();
+}
+
+function acceptFor(target, text) {
+  const trimmed = text.trim();
+  if (!trimmed) return;
+  if (target === "key") keyText = trimmed;
+  else receiptText = trimmed;
+  updateZoneStates();
+  run();
+}
+
+function wireZone(name) {
+  const zone = $(`zone-${name}`);
+  const input = $(`file-${name}`);
+  zone.addEventListener("click", () => input.click());
+  zone.addEventListener("keydown", (e) => { if (e.key === "Enter") input.click(); });
+  input.addEventListener("change", async () => {
+    if (input.files[0]) acceptFor(name, await input.files[0].text());
+    input.value = "";
+  });
+  zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("dragover"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+  zone.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    zone.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (file) acceptFor(name, await file.text());
+  });
+}
+
+function showError(message) {
+  const v = $("verdict");
+  v.className = "fail";
+  $("verdict-headline").textContent = t("invalid");
+  $("verdict-explain").textContent = message;
+  $("verdict-stages").innerHTML = "";
+  $("verdict-details").innerHTML = "";
+  $("reset").style.display = "inline-block";
+}
+
+function esc(s) {
+  const div = document.createElement("div");
+  div.textContent = String(s);
+  return div.innerHTML;
+}
+
+async function run() {
+  if (!receiptText || !keyText) { $("verdict").className = ""; return; }
+
+  let receipt;
+  try {
+    receipt = JSON.parse(receiptText);
+  } catch {
+    showError(t("errReceiptJson"));
+    return;
+  }
+
+  let imported;
+  try {
+    imported = await importPublicKey(keyText);
+  } catch (err) {
+    showError(t("errKey") + err.message);
+    return;
+  }
+
+  const result = await verifyReceipt(receipt, imported.key);
+  const v = $("verdict");
+  v.className = result.ok ? "ok" : "fail";
+  $("verdict-headline").textContent = result.ok ? t("valid") : t("invalid");
+  $("verdict-explain").textContent = result.ok
+    ? t("explainOk")
+    : t("explain" + result.failedStage[0].toUpperCase() + result.failedStage.slice(1));
+
+  const stageRow = (key, label) => {
+    const stage = result.stages[key];
+    const mark = stage === null ? "–" : stage.ok ? "✓" : "✗";
+    const suffix = stage === null ? ` (${t("stageSkipped")})` : "";
+    return `<li>${mark} ${esc(label)}${suffix}</li>`;
+  };
+  $("verdict-stages").innerHTML =
+    stageRow("structure", t("stageStructure")) +
+    stageRow("signature", t("stageSignature")) +
+    stageRow("inclusion", t("stageInclusion"));
+
+  let details = "";
+  if (result.ok) {
+    const e = receipt.entry;
+    const cp = receipt.checkpoint;
+    const fp = await keyFingerprint(imported.spkiDer);
+    details =
+      `<tr><td>${esc(t("dOrigin"))}</td><td>${esc(receipt.origin)}</td></tr>` +
+      `<tr><td>${esc(t("dSeq"))}</td><td>${esc(receipt.seq)}</td></tr>` +
+      `<tr><td>${esc(t("dEvent"))}</td><td>${esc(e.event ?? "—")}</td></tr>` +
+      `<tr><td>${esc(t("dTs"))}</td><td>${esc(e.ts ?? "—")}</td></tr>` +
+      `<tr><td>${esc(t("dCp"))}</td><td>${esc(I18N[lang].dCpValue(cp.size, cp.ts))}</td></tr>` +
+      `<tr><td>${esc(t("dKey"))}</td><td>${esc(fp)}</td></tr>`;
+  }
+  $("verdict-details").innerHTML = details;
+  $("reset").style.display = "inline-block";
+}
+
+$("lang-de").addEventListener("click", () => { lang = "de"; applyLang(); });
+$("lang-en").addEventListener("click", () => { lang = "en"; applyLang(); });
+$("reset").addEventListener("click", () => {
+  receiptText = keyText = null;
+  $("verdict").className = "";
+  $("reset").style.display = "none";
+  updateZoneStates();
+});
+document.addEventListener("paste", (e) => {
+  const text = e.clipboardData && e.clipboardData.getData("text");
+  if (text) accept(text);
+});
+wireZone("receipt");
+wireZone("key");
+applyLang();
+</script>
+</body>
+</html>

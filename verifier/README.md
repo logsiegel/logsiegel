@@ -14,8 +14,19 @@ Verification stages (each runs only if the previous one passed):
 3. **inclusion** — RFC 6962 audit path against the committed root
 
 Status: M1 (canonical JSON + structure stage + leaf hashing) — done.
-M2 (RFC 6962 inclusion verification) — done. M3 signature + UI, M4 full
-fixture matrix.
+M2 (RFC 6962 inclusion verification) — done. M3 (Ed25519 signature stage +
+single-file drag-and-drop UI, DE/EN) — done. M4 polish + full-matrix review.
+
+## Build the single-file verifier
+
+```bash
+node verifier/build.mjs
+```
+
+Writes `verifier/dist/logsiegel-verifier.html` (self-contained, works from
+`file://`) and self-checks the bundled code against all fixture verdicts.
+`dist/demo/` holds a valid receipt, a tampered one and the matching public
+key for hand-testing.
 
 ## Test vectors
 
