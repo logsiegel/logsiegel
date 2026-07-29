@@ -38,8 +38,19 @@ const template = readFileSync(here("ui/template.html"), "utf8");
 const marker = "// %BUNDLE%";
 if (!template.includes(marker)) throw new Error("template is missing the bundle marker");
 
+// Embed the demo pair (valid receipt + PEM key) for the one-click demo flow.
+const fixtures = JSON.parse(readFileSync(here("fixtures/receipts.json"), "utf8"));
+const demoCase = fixtures.cases.find((c) => c.name === "valid_seq7_size13");
+const demoLine = `const DEMO = ${JSON.stringify({
+  receipt: demoCase.receipt,
+  key: fixtures.public_key.pem,
+})};`;
+
 mkdirSync(here("dist"), { recursive: true });
-writeFileSync(here("dist/logsiegel-verifier.html"), template.replace(marker, bundle));
+writeFileSync(here("dist/logsiegel-verifier.html"), template
+  .replace(marker, bundle)
+  .replace("const DEMO = null; // %DEMO%", demoLine)
+  .replace("%BUILDDATE%", new Date().toISOString().slice(0, 10)));
 
 // -- self-check against the fixtures ----------------------------------------
 
@@ -47,7 +58,6 @@ writeFileSync(here("dist/bundle-test.mjs"),
   bundle + "\nexport { verifyReceipt, importPublicKey };\n");
 const lib = await import(pathToFileURL(here("dist/bundle-test.mjs")));
 
-const fixtures = JSON.parse(readFileSync(here("fixtures/receipts.json"), "utf8"));
 let pass = 0;
 for (const c of fixtures.cases) {
   const bundleB64 = (c.public_key_override ?? fixtures.public_key).spki_der_b64;
@@ -63,4 +73,15 @@ for (const c of fixtures.cases) {
 if (pass !== fixtures.cases.length) {
   throw new Error(`self-check failed: ${pass}/${fixtures.cases.length}`);
 }
-console.log(`dist/logsiegel-verifier.html written — self-check ${pass}/${fixtures.cases.length} verdicts match`);
+
+// Demo flow: embedded receipt verifies green; the tamper mutation turns red.
+const demoKey = (await lib.importPublicKey(fixtures.public_key.pem)).key;
+const green = await lib.verifyReceipt(demoCase.receipt, demoKey);
+const tampered = structuredClone(demoCase.receipt);
+tampered.entry.attrs["nachtraeglich_geaendert"] = true;
+const red = await lib.verifyReceipt(tampered, demoKey);
+if (!green.ok || red.ok || red.failedStage !== "inclusion") {
+  throw new Error("demo flow self-check failed");
+}
+
+console.log(`dist/logsiegel-verifier.html written — self-check ${pass}/${fixtures.cases.length} verdicts match, demo flow green→red ok`);

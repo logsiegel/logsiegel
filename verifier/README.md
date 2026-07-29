@@ -13,9 +13,11 @@ Verification stages (each runs only if the previous one passed):
 2. **signature** — Ed25519 over the canonical checkpoint body
 3. **inclusion** — RFC 6962 audit path against the committed root
 
-Status: M1 (canonical JSON + structure stage + leaf hashing) — done.
-M2 (RFC 6962 inclusion verification) — done. M3 (Ed25519 signature stage +
-single-file drag-and-drop UI, DE/EN) — done. M4 polish + full-matrix review.
+Status: M1–M4 done (canonical JSON, structure stage, RFC 6962 inclusion,
+Ed25519 signature, single-file drag-and-drop UI DE/EN). Polish included:
+one-click demo flow (load sample → green, tamper → red) embedded at build
+time, WebCrypto-Ed25519 capability warning, print stylesheet, file names,
+favicon, build stamp.
 
 ## Build the single-file verifier
 
