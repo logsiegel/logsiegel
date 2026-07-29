@@ -1,0 +1,103 @@
+{
+ "format": "logsiegel-canonical-vectors/1",
+ "vectors": [
+  {
+   "name": "empty_object",
+   "value": {},
+   "canonical_utf8_hex": "7b7d",
+   "sha256_hex": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+   "leaf_hash_hex": "28a3a18f6cd6406b086e9ffda1f9b8a13dbcf44b0f3f32cb9031a11fd053acf9"
+  },
+  {
+   "name": "key_sorting",
+   "value": {
+    "z": 1,
+    "a": 2,
+    "m": {
+     "y": 0,
+     "b": [
+      3,
+      2,
+      1
+     ]
+    }
+   },
+   "canonical_utf8_hex": "7b2261223a322c226d223a7b2262223a5b332c322c315d2c2279223a307d2c227a223a317d",
+   "sha256_hex": "f45c2b3e30571b7f897fea1a95665b3c34bb701a138c75b1269f5b570c244f4f",
+   "leaf_hash_hex": "14ac269f9e29c100a806c72bfe419680a5e6d226cbbbac203a520d74f7642834"
+  },
+  {
+   "name": "unicode_raw",
+   "value": {
+    "s": "äöü ß € 🔏 中文"
+   },
+   "canonical_utf8_hex": "7b2273223a22c3a4c3b6c3bc20c39f20e282ac20f09f948f20e4b8ade69687227d",
+   "sha256_hex": "e77cd2ac01602b7c2dc77d62f016e314c8fd73557d74bd567ad1c8d9723921cf",
+   "leaf_hash_hex": "9010ca242219e739522ae9fd4eb91c8df8cad7341a7ebd1971b741fa86139d7d"
+  },
+  {
+   "name": "escapes",
+   "value": {
+    "s": "quote \" backslash \\ newline \n tab \t ctrl \u0001"
+   },
+   "canonical_utf8_hex": "7b2273223a2271756f7465205c22206261636b736c617368205c5c206e65776c696e65205c6e20746162205c74206374726c205c7530303031227d",
+   "sha256_hex": "518c033a1086e3fada8b800e321b4957e00a572875173bb7bb3cf1703dabc651",
+   "leaf_hash_hex": "5867dd848dbd9536d08e4e41cc9f64c95c730440d8be337808121fdad86f2b53"
+  },
+  {
+   "name": "numbers",
+   "value": {
+    "i": 0,
+    "j": -7,
+    "k": 1234567890
+   },
+   "canonical_utf8_hex": "7b2269223a302c226a223a2d372c226b223a313233343536373839307d",
+   "sha256_hex": "6de50bec1a5fe99ddcb13dd6872e56c0816f0344753c186021ec4e108e62eb1f",
+   "leaf_hash_hex": "8e9aa225277126c99f2b5f31f11c74ad5227b0bb162f34bc7b00a90710ad7b94"
+  },
+  {
+   "name": "null_bool",
+   "value": {
+    "a": null,
+    "b": true,
+    "c": false
+   },
+   "canonical_utf8_hex": "7b2261223a6e756c6c2c2262223a747275652c2263223a66616c73657d",
+   "sha256_hex": "17073ac6186d8c60c0c0da712ce30cdb52ed5a9155f616983da39a9785dce715",
+   "leaf_hash_hex": "4985b41660166ca027e5ac8b4f0b3b29541acc24533348d61084ec397721a791"
+  },
+  {
+   "name": "nested_arrays",
+   "value": {
+    "a": [
+     {
+      "b": 1
+     },
+     [],
+     {},
+     "x"
+    ]
+   },
+   "canonical_utf8_hex": "7b2261223a5b7b2262223a317d2c5b5d2c7b7d2c2278225d7d",
+   "sha256_hex": "d449890b6f135a15d0a1906f8bd45be5d866ce594f10553b07e53e314c093023",
+   "leaf_hash_hex": "d00d72e0b2a417e4f50c5ad7dc5f0c31a566e6f6a75d9bf46f1c58c6bb071fad"
+  },
+  {
+   "name": "realistic_entry",
+   "value": {
+    "v": 0,
+    "seq": 3,
+    "ts": "2026-07-30T12:00:00.000001+00:00",
+    "event": "human_override",
+    "attrs": {
+     "reason": "korrigiert \"§ 12\"",
+     "Grüße": "übermittelt"
+    },
+    "prev": "sha256:abababababababababababababababababababababababababababababababab"
+   },
+   "canonical_utf8_hex": "7b226174747273223a7b224772c3bcc39f65223a22c3bc6265726d697474656c74222c22726561736f6e223a226b6f7272696769657274205c22c2a72031325c22227d2c226576656e74223a2268756d616e5f6f76657272696465222c2270726576223a227368613235363a61626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162616261626162222c22736571223a332c227473223a22323032362d30372d33305431323a30303a30302e3030303030312b30303a3030222c2276223a307d",
+   "sha256_hex": "28b4fa8b8f775505155d20fa1fb664a979ab4802b73ee7e07d07952252cfb6fc",
+   "leaf_hash_hex": "ae4f6fab58a8d85a0061f0585a538e4c926eccc7fc8ae08c60fb0cc7c17638fa"
+  }
+ ]
+}
