@@ -2,9 +2,9 @@
  "format": "logsiegel-receipt-fixtures/1",
  "origin": "stadt.example/buergerservice-assistent",
  "public_key": {
-  "pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAU8INMhLc3WSChSFYmFaM1v9FmPV/HMYAkq2w17aA4BU=\n-----END PUBLIC KEY-----\n",
-  "spki_der_b64": "MCowBQYDK2VwAyEAU8INMhLc3WSChSFYmFaM1v9FmPV/HMYAkq2w17aA4BU=",
-  "raw_hex": "53c20d3212dcdd648285215898568cd6ff4598f57f1cc60092adb0d7b680e015"
+  "pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAxPJojU0Pp7aEOmndXhrkBaQ3sa4uoORCJmRhBPRpE90=\n-----END PUBLIC KEY-----\n",
+  "spki_der_b64": "MCowBQYDK2VwAyEAxPJojU0Pp7aEOmndXhrkBaQ3sa4uoORCJmRhBPRpE90=",
+  "raw_hex": "c4f2688d4d0fa7b6843a69dd5e1ae405a437b1ae2ea0e44226646104f46913dd"
  },
  "cases": [
   {
@@ -22,24 +22,25 @@
      "event": "system_start",
      "prev": "sha256:ed9f449af01267f754bc3d03bf1c8978faa763caf3e783d2f082101d1006b40b",
      "seq": 0,
-     "ts": "2026-07-29T22:42:41.393415+00:00",
+     "ts": "2026-07-29T22:46:31.233703+00:00",
      "v": 0
     },
     "inclusion_proof": [],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "6b34f1c915220c3f25ffe84224a5270c10e91668206ce91eece04cd8fbbf7bd3",
-     "sig": "54d12327f9c0bae85743a756ccc10a55eb7b1b2ad59becb09ca5b0f1752da736a099660cc725bed70b6fbf9798d50210a9dc3b3740bfd1b9431737c3c8ac0d02",
+     "root": "5e240762d20466b0612d4de4ed56eb75feb3a139a6767b77fd926770056a085b",
+     "sig": "32445c6ce275543d088b654beb6bbd0f93e20e97a25139d0f41cd20cfe9ac92e2cb1a17ae7c3f951a453cc34ba2575cdd42d29c4cf9a56832a9119796afc950e",
      "size": 1,
-     "ts": "2026-07-29T22:42:41.393721+00:00"
+     "ts": "2026-07-29T22:46:31.234017+00:00"
     }
    },
-   "entry_leaf_hash_hex": "6b34f1c915220c3f25ffe84224a5270c10e91668206ce91eece04cd8fbbf7bd3",
+   "entry_leaf_hash_hex": "5e240762d20466b0612d4de4ed56eb75feb3a139a6767b77fd926770056a085b",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "valid_seq0_size13",
@@ -56,29 +57,30 @@
      "event": "system_start",
      "prev": "sha256:ed9f449af01267f754bc3d03bf1c8978faa763caf3e783d2f082101d1006b40b",
      "seq": 0,
-     "ts": "2026-07-29T22:42:41.393415+00:00",
+     "ts": "2026-07-29T22:46:31.233703+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "4238a40256e1a6a5498edba7ffab5d25f326e50827bf387eb284b4644a4508b9",
-     "07c85e61f80c99436ecbc409c9fae0ba89ed467b4bcf2cc55d37042527a9692c",
-     "d467ac0221e23e6b5d5e8e4652ddcd94a6f6bc841f14972861deae2bb9a5dd01",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "bdae82e237c8c0f902b2e1f77c03c5662276d789e2f7ed0cf1afa323d98d50c3",
+     "90e4cd780eb0d1cfa2831caa24204118e67ab826b21f87b4240f030a6594d112",
+     "94efee4c0ad6e3faa781ed9a3c57d31aaaac7bc968752af62346e8f7b7fe6028",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "6b34f1c915220c3f25ffe84224a5270c10e91668206ce91eece04cd8fbbf7bd3",
+   "entry_leaf_hash_hex": "5e240762d20466b0612d4de4ed56eb75feb3a139a6767b77fd926770056a085b",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "valid_seq7_size13",
@@ -92,31 +94,32 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "valid_seq12_size13",
@@ -128,29 +131,30 @@
     "entry": {
      "attrs": {},
      "event": "system_stop",
-     "prev": "sha256:c713d5ff1245875a89e6e1de661f852c8906e88228e9dd246f3705436eb00a33",
+     "prev": "sha256:69339546d946b7248d23b84a6f59ad3bf98ad5d83db33ecbb64dc15c63b8a8ba",
      "seq": 12,
-     "ts": "2026-07-29T22:42:41.396289+00:00",
+     "ts": "2026-07-29T22:46:31.236688+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "ead38bd563d849cd037c3c2136f02a64ffc97048ff819c8ffc065b2cc692909d",
-     "53b9dcfbeb0ff0dc4ad587bf8e37c15cfa7c680c71fb3bc6441e3048c4f76f87"
+     "a84a54c7300e4d6d9d27c3436ea284b15bae7a7716d2e3bea42ff8a0aafade39",
+     "940c79f40a8e603b5e090ea5a9e652771da5b92c6bc47b125fb407d0fe7e2f2a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "59bf05156c1fcb06bc5d9d5c439ed58dd85f80eea2715c49b561206889f8ab0a",
+   "entry_leaf_hash_hex": "20c0e1e80e9c813c0810ed9c2521542150af1bd17028555e2bd2e955ec0db14d",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "valid_after_shred",
@@ -164,34 +168,35 @@
       "gen_ai.request.model": "demo-1"
      },
      "event": "inference",
-     "input_hash": "sha256:d3a555eeb77f089984bbac392bcc965728215a17fffc5a5920b9cdbbf0ebdebc",
-     "output_hash": "sha256:c31ddaaae6c59890943348ac357fa278b46ace09e6912f2c5f427161abd1209f",
+     "input_hash": "sha256:011bf897d6039c7c5ea02a7d19a328c37ffe2ecb238d714f53ebf4aa57854b09",
+     "output_hash": "sha256:190e82b7475cfd9b06972ad9eea84c5a5bf4b0fbff8ead08d38822131f3d7505",
      "payload_ref": "payloads/00000001.enc",
-     "prev": "sha256:9ad97757fdcc4bdadb9d8697d02913989314b1401cf7c357c36a09e621cac159",
+     "prev": "sha256:00c699e46e6ebf38fa57d195655c2a2cbd24374d8943d244555a4f2df0df2110",
      "seq": 1,
-     "ts": "2026-07-29T22:42:41.394581+00:00",
+     "ts": "2026-07-29T22:46:31.234923+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "6b34f1c915220c3f25ffe84224a5270c10e91668206ce91eece04cd8fbbf7bd3",
-     "07c85e61f80c99436ecbc409c9fae0ba89ed467b4bcf2cc55d37042527a9692c",
-     "d467ac0221e23e6b5d5e8e4652ddcd94a6f6bc841f14972861deae2bb9a5dd01",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "5e240762d20466b0612d4de4ed56eb75feb3a139a6767b77fd926770056a085b",
+     "90e4cd780eb0d1cfa2831caa24204118e67ab826b21f87b4240f030a6594d112",
+     "94efee4c0ad6e3faa781ed9a3c57d31aaaac7bc968752af62346e8f7b7fe6028",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "4238a40256e1a6a5498edba7ffab5d25f326e50827bf387eb284b4644a4508b9",
+   "entry_leaf_hash_hex": "bdae82e237c8c0f902b2e1f77c03c5662276d789e2f7ed0cf1afa323d98d50c3",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "valid_unicode",
@@ -205,31 +210,32 @@
       "note": "Umlaute äöü, Emoji 🔏, Backslash \\ und\nZeilenumbruch"
      },
      "event": "inference",
-     "prev": "sha256:2a59125f0d2fc97702fd1749ab914bbe1a2c8c68e203fb0e7e6b093f2da2d9ba",
+     "prev": "sha256:d141f55dbf6dcc46356e68cf7a2d8de7a19d03a82c1d955617c712d5340a216d",
      "seq": 4,
-     "ts": "2026-07-29T22:42:41.395376+00:00",
+     "ts": "2026-07-29T22:46:31.235813+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "2941f5240066ec665fbdba24ae63b6831d91608bcc4c55e78bb08e22f499e3e3",
-     "4b26512bb5c27aef0237883d32475a06657de58d3b4aee533634cfe4096b1bac",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "edde7e34abe4ef34284166cda7a80474601cad57d5d774d47a8291f41e524e81",
+     "b3e4973e6b7049b03bed122df242d9c0c10f580e6ea1a5dc8313ca51c66c0fae",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "da99e1072ebde5271e89753aeb68f53299a1c2a4d504416a41f8ca2baad1e355",
+   "entry_leaf_hash_hex": "99bc9c10da4d2bb1027d572f7c52392c5dad203dd36bab494e9ad6c6f838129a",
    "python_report": {
     "ok": true,
     "problems": []
    },
-   "expect_stage": "ok"
+   "expect_stage": "ok",
+   "expect_inclusion": true
   },
   {
    "name": "tampered_entry",
@@ -243,33 +249,34 @@
       "i": 99
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "945ae00087e26fd74c35242eaedef897b57b9ca63fb829bed6da09cf0a0bffea",
+   "entry_leaf_hash_hex": "b30af1cef598528d51e0989b5a1c8fa66306171c9209817728576c646ec365ff",
    "python_report": {
     "ok": false,
     "problems": [
      "inclusion proof invalid for entry 7"
     ]
    },
-   "expect_stage": "inclusion"
+   "expect_stage": "inclusion",
+   "expect_inclusion": false
   },
   {
    "name": "seq_mismatch",
@@ -283,33 +290,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "entry/seq mismatch in receipt"
     ]
    },
-   "expect_stage": "structure"
+   "expect_stage": "structure",
+   "expect_inclusion": false
   },
   {
    "name": "origin_mismatch",
@@ -323,33 +331,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "origin mismatch between receipt and checkpoint"
     ]
    },
-   "expect_stage": "structure"
+   "expect_stage": "structure",
+   "expect_inclusion": true
   },
   {
    "name": "wrong_root",
@@ -363,33 +372,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "14a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "1b44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "checkpoint signature invalid"
     ]
    },
-   "expect_stage": "signature"
+   "expect_stage": "signature",
+   "expect_inclusion": false
   },
   {
    "name": "bad_signature",
@@ -403,33 +413,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "19a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "27cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "checkpoint signature invalid"
     ]
    },
-   "expect_stage": "signature"
+   "expect_stage": "signature",
+   "expect_inclusion": true
   },
   {
    "name": "proof_reordered",
@@ -443,33 +454,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "inclusion proof invalid for entry 7"
     ]
    },
-   "expect_stage": "inclusion"
+   "expect_stage": "inclusion",
+   "expect_inclusion": false
   },
   {
    "name": "proof_truncated",
@@ -483,32 +495,33 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "inclusion proof invalid for entry 7"
     ]
    },
-   "expect_stage": "inclusion"
+   "expect_stage": "inclusion",
+   "expect_inclusion": false
   },
   {
    "name": "proof_not_hex",
@@ -522,33 +535,34 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "zz7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "zz5b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "inclusion proof invalid for entry 7"
     ]
    },
-   "expect_stage": "structure"
+   "expect_stage": "structure",
+   "expect_inclusion": false
   },
   {
    "name": "index_beyond_size",
@@ -560,31 +574,32 @@
     "entry": {
      "attrs": {},
      "event": "system_stop",
-     "prev": "sha256:c713d5ff1245875a89e6e1de661f852c8906e88228e9dd246f3705436eb00a33",
+     "prev": "sha256:69339546d946b7248d23b84a6f59ad3bf98ad5d83db33ecbb64dc15c63b8a8ba",
      "seq": 13,
-     "ts": "2026-07-29T22:42:41.396289+00:00",
+     "ts": "2026-07-29T22:46:31.236688+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "ead38bd563d849cd037c3c2136f02a64ffc97048ff819c8ffc065b2cc692909d",
-     "53b9dcfbeb0ff0dc4ad587bf8e37c15cfa7c680c71fb3bc6441e3048c4f76f87"
+     "a84a54c7300e4d6d9d27c3436ea284b15bae7a7716d2e3bea42ff8a0aafade39",
+     "940c79f40a8e603b5e090ea5a9e652771da5b92c6bc47b125fb407d0fe7e2f2a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "cc271e5c20179102a18e63a1bc2f5ca48377e28f3eb1c5ac10149c7d9908b401",
+   "entry_leaf_hash_hex": "f7910ef3754df650da787e20679f4038ae23260e9f8ae62f7d67a6bdd43e8ef8",
    "python_report": {
     "ok": false,
     "problems": [
      "inclusion proof invalid for entry 13"
     ]
    },
-   "expect_stage": "inclusion"
+   "expect_stage": "inclusion",
+   "expect_inclusion": false
   },
   {
    "name": "checkpoint_missing_root",
@@ -598,32 +613,33 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
      "checkpoint signature invalid"
     ]
    },
-   "expect_stage": "structure"
+   "expect_stage": "structure",
+   "expect_inclusion": false
   },
   {
    "name": "entry_not_object",
@@ -634,17 +650,17 @@
     "seq": 7,
     "entry": "not-an-object",
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
    "entry_leaf_hash_hex": null,
@@ -654,7 +670,8 @@
      "entry/seq mismatch in receipt"
     ]
    },
-   "expect_stage": "structure"
+   "expect_stage": "structure",
+   "expect_inclusion": null
   },
   {
    "name": "wrong_public_key",
@@ -668,26 +685,26 @@
       "i": 2
      },
      "event": "inference",
-     "prev": "sha256:470eee77e4857b478e59cd7e6871c3027d6648625260a217a6a8c49e3d174cd8",
+     "prev": "sha256:8cc4d84b0c07d79c8e5a4421e0fcdc6d511b6da7662c74024570fc15c8f7a540",
      "seq": 7,
-     "ts": "2026-07-29T22:42:41.395946+00:00",
+     "ts": "2026-07-29T22:46:31.236366+00:00",
      "v": 0
     },
     "inclusion_proof": [
-     "df7c4441d71ae5d95b4f7bb9cdf8c57dce96de69cc1d94f5f48fb428a80b9ad7",
-     "6288d54ea0c14611768da31d735a14b61154efcb4e10779fe20526ce10e3aabd",
-     "bad09c1246cb8072514be1a78135bdc2c77c4573c220e7d13792bf74958807eb",
-     "5ed59ffb4aa2b5d4990c71231cfd8f230b07a00dde117bbb8088b3d2c208b379"
+     "085b25c8f3839440bb10b38134ab4c208936ffbb0f7b9850693ba8b8fb53c962",
+     "dba8f4670a35ef872ffa0470c4887c746f608f33eab0b7a2a2504631be98eb72",
+     "57d240546eafd06734272928606d41b7b8f8917e432f5433d4b5028c900636da",
+     "8ec70aea685d71b309f16438b4e96da613a5774eaf9f8a5fcc4e00239d66311a"
     ],
     "checkpoint": {
      "origin": "stadt.example/buergerservice-assistent",
-     "root": "84a9c67a6f4ed3d3405ae4e47b05d7bb19c4e376525a8715ac759f668ddde26d",
-     "sig": "49a9628e8d269b8f1109313ce2742cb055f03e48d69f88ae9b6fea2a058df90991514bb675c0d6a14bf89d8b6bf270d3892a26a8a79685f205d932a822672109",
+     "root": "bb44abb463b1ab1ce0f3f57bcbccea54ca6cb7f80e6d21119cbc759873b0ddbb",
+     "sig": "17cf6521836bef9a82eb9575cf2e36e23d3786202d552111fa503a5e0523d87d799a7783d3d7193d47cbcfa500b176821c91e9caed126bd8c6ced6b0be9dc300",
      "size": 13,
-     "ts": "2026-07-29T22:42:41.396390+00:00"
+     "ts": "2026-07-29T22:46:31.236784+00:00"
     }
    },
-   "entry_leaf_hash_hex": "2a550f01c1df9eb346004651d582fecf25cb598765ce00ff428e018f9cbca63d",
+   "entry_leaf_hash_hex": "23e86a6b2527ab3268b9c0f4c1b858b8125df3bedb2de07af16356a0f8273cad",
    "python_report": {
     "ok": false,
     "problems": [
@@ -695,10 +712,11 @@
     ]
    },
    "expect_stage": "signature",
+   "expect_inclusion": true,
    "public_key_override": {
-    "pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAncy7qZhUZwxAIG2uAollhxEnkQVHAConLjSnqWgy094=\n-----END PUBLIC KEY-----\n",
-    "spki_der_b64": "MCowBQYDK2VwAyEAncy7qZhUZwxAIG2uAollhxEnkQVHAConLjSnqWgy094=",
-    "raw_hex": "9dccbba99854670c40206dae028965871127910547002a272e34a7a96832d3de"
+    "pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAL4XFST3lAetiFk6vfMI3a2frfuLXX/hydyRW16AoAzc=\n-----END PUBLIC KEY-----\n",
+    "spki_der_b64": "MCowBQYDK2VwAyEAL4XFST3lAetiFk6vfMI3a2frfuLXX/hydyRW16AoAzc=",
+    "raw_hex": "2f85c5493de501eb62164eaf7cc2376b67eb7ee2d75ff872772456d7a0280337"
    }
   }
  ]

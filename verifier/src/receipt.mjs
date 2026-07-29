@@ -13,7 +13,8 @@
  * expected JS stage per case.
  */
 
-import { canonicalBytes, bytesToHex } from "./canonical.mjs";
+import { canonicalBytes, bytesToHex, hexToBytes } from "./canonical.mjs";
+import { leafHash, verifyInclusion } from "./merkle.mjs";
 
 const SHA256_HEX_LEN = 64;
 const ED25519_SIG_HEX_LEN = 128;
@@ -92,21 +93,30 @@ export function checkStructure(receipt) {
   return { ok: problems.length === 0, problems };
 }
 
-const LEAF_PREFIX = 0x00;
-
-async function sha256(bytes) {
-  return new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-}
-
-/** RFC 6962 leaf hash: SHA-256(0x00 || data). */
-export async function leafHash(data) {
-  const prefixed = new Uint8Array(data.length + 1);
-  prefixed[0] = LEAF_PREFIX;
-  prefixed.set(data, 1);
-  return sha256(prefixed);
-}
-
 /** Leaf hash of an entry object (canonical JSON bytes), as lowercase hex. */
 export async function entryLeafHashHex(entry) {
   return bytesToHex(await leafHash(canonicalBytes(entry)));
+}
+
+export { leafHash };
+
+/**
+ * Stage 3: RFC 6962 inclusion — is the entry committed by the checkpoint's
+ * root? Callers must run this only after `checkStructure` passed; the hex
+ * fields and integer types are trusted here.
+ * @returns {Promise<{ok: boolean, problems: {stage: string, code: string, message: string}[]}>}
+ */
+export async function checkInclusion(receipt) {
+  const cp = receipt.checkpoint;
+  const leaf = await leafHash(canonicalBytes(receipt.entry));
+  const proof = receipt.inclusion_proof.map(hexToBytes);
+  const ok = await verifyInclusion(leaf, receipt.seq, cp.size, proof, hexToBytes(cp.root));
+  return {
+    ok,
+    problems: ok ? [] : [{
+      stage: "inclusion",
+      code: "inclusion_invalid",
+      message: `inclusion proof invalid for entry ${receipt.seq}`,
+    }],
+  };
 }

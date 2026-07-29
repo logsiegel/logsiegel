@@ -14,7 +14,8 @@ Verification stages (each runs only if the previous one passed):
 3. **inclusion** — RFC 6962 audit path against the committed root
 
 Status: M1 (canonical JSON + structure stage + leaf hashing) — done.
-M2 inclusion, M3 signature + UI, M4 full fixture matrix.
+M2 (RFC 6962 inclusion verification) — done. M3 signature + UI, M4 full
+fixture matrix.
 
 ## Test vectors
 

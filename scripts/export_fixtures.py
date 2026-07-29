@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cryptography.hazmat.primitives import serialization
 
 from logsiegel.core import Logsiegel, canonical, verify_receipt
-from logsiegel.merkle import leaf_hash
+from logsiegel.merkle import leaf_hash, verify_inclusion
 
 OUT_DIR = Path(__file__).resolve().parents[1] / "verifier" / "fixtures"
 
@@ -70,6 +70,22 @@ def case(name: str, receipt: dict, pub, expect_stage: str, note: str = "") -> di
     entry_leaf = None
     if isinstance(receipt.get("entry"), dict):
         entry_leaf = leaf_hash(canonical(receipt["entry"])).hex()
+
+    # Inclusion verdict independent of the signature stage (verify_receipt
+    # returns early on signature failure, but the JS stage needs a ground
+    # truth for every case). None = not computable from this receipt.
+    expect_inclusion = None
+    cp = receipt.get("checkpoint")
+    if entry_leaf is not None and isinstance(cp, dict):
+        try:
+            proof = [bytes.fromhex(p) for p in receipt.get("inclusion_proof", [])]
+            expect_inclusion = verify_inclusion(
+                bytes.fromhex(entry_leaf), receipt.get("seq"),
+                cp["size"], proof, bytes.fromhex(cp["root"]),
+            )
+        except (KeyError, ValueError, TypeError):
+            expect_inclusion = False
+
     return {
         "name": name,
         "note": note,
@@ -77,6 +93,7 @@ def case(name: str, receipt: dict, pub, expect_stage: str, note: str = "") -> di
         "entry_leaf_hash_hex": entry_leaf,
         "python_report": {"ok": report.ok, "problems": report.problems},
         "expect_stage": expect_stage,
+        "expect_inclusion": expect_inclusion,
     }
 
 
