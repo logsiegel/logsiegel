@@ -90,6 +90,7 @@
     <div class="lang">
       <button id="lang-de" aria-pressed="true">DE</button>
       <button id="lang-en" aria-pressed="false">EN</button>
+      <button id="lang-fr" aria-pressed="false">FR</button>
     </div>
   </header>
   <p class="tagline" data-i18n="tagline"></p>
@@ -201,12 +202,47 @@ const I18N = {
     warnCrypto: "This browser does not support the required cryptography (WebCrypto Ed25519). Please use a current Safari, Chrome or Firefox.",
     builtOn: "Built",
   },
+  fr: {
+    tagline: "Vérifie un justificatif Logsiegel (receipt) — entièrement en local, dans votre navigateur. Rien ne quitte cet appareil ; la vérification fonctionne aussi sans Internet.",
+    receiptTitle: "Justificatif (receipt.json)",
+    receiptHint: "Déposez le fichier ici, cliquez, ou collez son contenu",
+    keyTitle: "Clé publique",
+    keyHint: "Déposez le fichier PEM (signing_key.pub) ici, cliquez, ou collez",
+    keyTrust: "Important : procurez-vous la clé publique indépendamment de la personne qui vous a remis le justificatif — sinon vous vérifiez seulement que l'expéditeur est d'accord avec lui-même.",
+    loaded: "chargé",
+    valid: "JUSTIFICATIF VALIDE",
+    invalid: "JUSTIFICATIF INVALIDE",
+    explainOk: "L'entrée fait partie du journal attesté, et le point de contrôle porte une signature valide sous la clé fournie.",
+    explainStructure: "Le justificatif est endommagé ou incomplet — il n'a pas la forme attendue.",
+    explainSignature: "La signature du point de contrôle ne correspond pas à la clé publique. Ce point de contrôle n'a pas été émis par le détenteur de cette clé — ou a été modifié après coup.",
+    explainInclusion: "L'entrée ne fait pas partie du journal auquel le point de contrôle signé s'engage — le contenu a été modifié ou le justificatif est falsifié.",
+    stageStructure: "Structure",
+    stageSignature: "Signature",
+    stageInclusion: "Inclusion dans le journal",
+    stageSkipped: "ignorée",
+    dOrigin: "Origine (origin)",
+    dSeq: "Entrée n°",
+    dEvent: "Événement",
+    dTs: "Horodatage de l'entrée",
+    dCp: "Point de contrôle",
+    dCpValue: (size, ts) => `sur ${size} entrées, signé le ${ts}`,
+    dKey: "Empreinte de la clé",
+    errReceiptJson: "Le justificatif n'est pas un JSON valide.",
+    errKey: "La clé publique n'a pas pu être lue : ",
+    reset: "Réinitialiser",
+    footer: "Logsiegel — journaux d'activité à falsification détectable pour systèmes d'IA. Vous pouvez archiver ce fichier et l'utiliser hors ligne.",
+    demoLoad: "Démo : charger un justificatif et une clé d'exemple",
+    demoTamper: "Démo : modifier l'entrée après coup — la vérification doit alors échouer",
+    warnCrypto: "Ce navigateur ne prend pas en charge la cryptographie requise (WebCrypto Ed25519). Veuillez utiliser un Safari, Chrome ou Firefox récent.",
+    builtOn: "Version du",
+  },
 };
 
 const DEMO = null; // %DEMO%
 const BUILD_DATE = "%BUILDDATE%";
 
-let lang = navigator.language && navigator.language.toLowerCase().startsWith("de") ? "de" : "en";
+const navLang = (navigator.language || "").toLowerCase();
+let lang = navLang.startsWith("de") ? "de" : navLang.startsWith("fr") ? "fr" : "en";
 let receiptText = null;
 let keyText = null;
 let receiptName = null;
@@ -220,6 +256,7 @@ function applyLang() {
   document.documentElement.lang = lang;
   $("lang-de").setAttribute("aria-pressed", String(lang === "de"));
   $("lang-en").setAttribute("aria-pressed", String(lang === "en"));
+  $("lang-fr").setAttribute("aria-pressed", String(lang === "fr"));
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
@@ -383,6 +420,7 @@ async function probeCrypto() {
 
 $("lang-de").addEventListener("click", () => { lang = "de"; applyLang(); });
 $("lang-en").addEventListener("click", () => { lang = "en"; applyLang(); });
+$("lang-fr").addEventListener("click", () => { lang = "fr"; applyLang(); });
 $("reset").addEventListener("click", () => {
   receiptText = keyText = receiptName = keyName = null;
   demoActive = false;
