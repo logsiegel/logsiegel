@@ -1,8 +1,17 @@
 # Logsiegel
 
-[![ci](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml/badge.svg)](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml)
+**Prove your AI didn't lie.**
 
-**Tamper-evident, privacy-preserving event logs for AI systems.**
+[![ci](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml/badge.svg)](https://github.com/logsiegel/logsiegel/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/logsiegel.svg)](https://pypi.org/project/logsiegel/)
+[![Python](https://img.shields.io/pypi/pyversions/logsiegel.svg)](https://pypi.org/project/logsiegel/)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
+[Website](https://logsiegel.com) ·
+[Try the browser verifier](https://logsiegel.com/verifier/) (offline, drag & drop a receipt) ·
+[PyPI](https://pypi.org/project/logsiegel/)
+
+Tamper-evident, privacy-preserving event logs for AI systems.
 
 When an AI system or agent acts — answers, decides, books, escalates — the
 record of what happened usually lives in an ordinary database at the
@@ -43,7 +52,7 @@ that don't have a compliance-engineering department.
 ## Quick start
 
 ```bash
-pip install -e .
+pip install logsiegel            # from source: pip install -e ".[dev]"
 
 logsiegel init ./mylog --origin "acme.example/support-bot"
 logsiegel log ./mylog --event inference \
@@ -110,15 +119,19 @@ Logsiegel is tamper-*evident*, not tamper-*proof*. Precisely:
 
 ## Status
 
-Proof of concept (v0.1): local filesystem, minimal AI-lifecycle event
-taxonomy (pluggable per writer), RFC 6962 inclusion + consistency proofs,
+v0.1.0 on PyPI: local filesystem, minimal AI-lifecycle event taxonomy
+(pluggable per writer), RFC 6962 inclusion + consistency proofs,
 single-entry receipts, crypto-shredding, PII masking, dossier export,
-LiteLLM adapter. Roadmap: agent-action taxonomy (tool calls, delegation,
-value flows, human intervention) with OTel GenAI span semantics, mandate
-binding to verifiable credentials / eID ecosystems, witness co-signing
-(C2SP-style checkpoints), retention policy engine, TypeScript SDK and
-browser verifier, mapping to emerging logging standards (EU AI Act Art. 12,
-prEN 18229-1, ISO/IEC 24970).
+LiteLLM adapter, and an independent **browser verifier** (plain JS +
+WebCrypto, single HTML file, runs offline; source in [`verifier/`](verifier/),
+live at [logsiegel.com/verifier](https://logsiegel.com/verifier/)) that
+agrees with the Python reference on every test vector. 57 tests.
+
+Roadmap: agent-action taxonomy (tool calls, delegation, value flows, human
+intervention) with OTel GenAI span semantics, mandate binding to verifiable
+credentials / eID ecosystems, independent witness co-signing (C2SP-style
+checkpoints), retention policy engine, TypeScript SDK, mapping to emerging
+logging standards (EU AI Act Art. 12, prEN 18229-1, ISO/IEC 24970).
 
 ## License
 
