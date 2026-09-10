@@ -1,0 +1,57 @@
+name: publish
+
+# Veröffentlicht logsiegel auf PyPI über Trusted Publishing (OIDC), ohne Token.
+# Auslösen: `gh workflow run publish.yml -f version=0.1.1` oder Tag `v0.1.1` pushen.
+# PyPI-Seite: Publisher = logsiegel/logsiegel, Workflow publish.yml, Environment pypi.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, die veröffentlicht wird (muss zu pyproject.toml passen)"
+        required: true
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Version prüfen
+        run: |
+          set -e
+          PROJ=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          WANT="${{ inputs.version }}"
+          if [ -z "$WANT" ]; then WANT="${GITHUB_REF_NAME#v}"; fi
+          echo "pyproject: $PROJ, angefordert: $WANT"
+          [ "$PROJ" = "$WANT" ] || { echo "::error::Version passt nicht (pyproject $PROJ, angefordert $WANT)"; exit 1; }
+      - run: pip install -e . pytest build twine
+      - run: pytest -q
+      - run: python -m build
+      - run: python -m twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          attestations: true
