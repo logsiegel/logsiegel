@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "logsiegel"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tamper-evident, privacy-preserving event logs for AI systems (transparency-log style, no blockchain)"
 readme = "README.md"
 license = "Apache-2.0"
@@ -15,6 +15,9 @@ dependencies = ["cryptography>=42"]
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 litellm = ["litellm"]
+# In-process-PII-Erkennung über die Saklam-Engine (Lizenzschlüssel nötig,
+# siehe logsiegel/integrations/saklam.py).
+saklam = ["saklam>=0.1"]
 
 [project.scripts]
 logsiegel = "logsiegel.cli:main"

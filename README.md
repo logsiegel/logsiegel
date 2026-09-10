@@ -53,6 +53,7 @@ that don't have a compliance-engineering department.
 
 ```bash
 pip install logsiegel            # from source: pip install -e ".[dev]"
+pip install "logsiegel[saklam]"  # optional: in-process PII masking of stored payloads (Saklam licence key required)
 
 logsiegel init ./mylog --origin "acme.example/support-bot"
 logsiegel log ./mylog --event inference \
@@ -119,7 +120,9 @@ Logsiegel is tamper-*evident*, not tamper-*proof*. Precisely:
 
 ## Status
 
-v0.1.0 on PyPI: local filesystem, minimal AI-lifecycle event taxonomy
+v0.1.1 on PyPI (adds the optional `saklam` extra: in-process PII masking
+of stored payloads via the Saklam engine, no HTTP hop, licence key required).
+v0.1.0: local filesystem, minimal AI-lifecycle event taxonomy
 (pluggable per writer), RFC 6962 inclusion + consistency proofs,
 single-entry receipts, crypto-shredding, PII masking, dossier export,
 LiteLLM adapter, and an independent **browser verifier** (plain JS +
