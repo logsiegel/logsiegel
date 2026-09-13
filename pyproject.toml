@@ -4,13 +4,44 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "logsiegel"
-version = "0.1.1"
+version = "0.1.2"
 description = "Tamper-evident, privacy-preserving event logs for AI systems (transparency-log style, no blockchain)"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [{ name = "Stefan Böck" }]
+keywords = [
+  "audit log",
+  "tamper-evident",
+  "ed25519",
+  "hash chain",
+  "merkle tree",
+  "transparency log",
+  "ai agents",
+  "receipts",
+]
+# Kein "License :: OSI Approved"-Classifier: `license` ist ein PEP-639-Ausdruck,
+# setuptools lehnt die Kombination ab.
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security :: Cryptography",
+  "Topic :: System :: Logging",
+]
 dependencies = ["cryptography>=42"]
+
+[project.urls]
+Homepage = "https://logsiegel.com"
+Documentation = "https://logsiegel.com/en/"
+Repository = "https://github.com/logsiegel/logsiegel"
+Verifier = "https://logsiegel.com/verifier/"
+Changelog = "https://github.com/logsiegel/logsiegel/blob/main/CHANGELOG.md"
+Issues = "https://github.com/logsiegel/logsiegel/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

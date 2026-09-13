@@ -2,5 +2,5 @@
 
 from .core import EVENT_TYPES, Logsiegel, VerifyReport, verify_receipt
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __all__ = ["Logsiegel", "VerifyReport", "EVENT_TYPES", "verify_receipt", "__version__"]

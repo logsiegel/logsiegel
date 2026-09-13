@@ -120,8 +120,9 @@ Logsiegel is tamper-*evident*, not tamper-*proof*. Precisely:
 
 ## Status
 
-v0.1.1 on PyPI (adds the optional `saklam` extra: in-process PII masking
-of stored payloads via the Saklam engine, no HTTP hop, licence key required).
+v0.1.2 on PyPI (packaging metadata only — see [CHANGELOG.md](CHANGELOG.md)).
+v0.1.1 added the optional `saklam` extra: in-process PII masking
+of stored payloads via the Saklam engine, no HTTP hop, licence key required.
 v0.1.0: local filesystem, minimal AI-lifecycle event taxonomy
 (pluggable per writer), RFC 6962 inclusion + consistency proofs,
 single-entry receipts, crypto-shredding, PII masking, dossier export,
@@ -135,6 +136,12 @@ intervention) with OTel GenAI span semantics, mandate binding to verifiable
 credentials / eID ecosystems, independent witness co-signing (C2SP-style
 checkpoints), retention policy engine, TypeScript SDK, mapping to emerging
 logging standards (EU AI Act Art. 12, prEN 18229-1, ISO/IEC 24970).
+
+## Maintainers
+
+Stefan Böck (code) and Emmanuelle St-Pierre-Wittwer (regulatory).
+Project site: [logsiegel.com](https://logsiegel.com) · contact:
+logsiegel@stefan.boeck.name · security reports: [SECURITY.md](SECURITY.md)
 
 ## License
 
