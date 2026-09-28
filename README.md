@@ -83,6 +83,28 @@ litellm.callbacks = [LogsiegelLogger("/var/lib/logsiegel/prod", store_payload=Tr
 Every completion becomes a signed-committable `inference` event; failures are
 recorded as `anomaly`.
 
+## Where Logsiegel runs
+
+- **Withdraw witness at anycast.dev (network measurement).** Since
+  September 2026 an anycast measurement lab uses Logsiegel as its evidence
+  layer. When an anycast node withdraws its route, an appender writes every
+  event (RIS Live BGP messages, RIPE Atlas measurements, host digs, the
+  drain playbook) into a Logsiegel trail; checkpoints are additionally
+  timestamped via RFC 3161 at DigiCert. The runs are published in full
+  (log, checkpoints, tokens; the public key was published beforehand), so
+  third parties can verify them without access to the operator. There is no
+  AI in this use case: it shows that the trail format is not tied to AI
+  semantics. Pinned to `logsiegel==0.1.2`.
+  Trails: [anycast.dev/witness](https://anycast.dev/witness/) ·
+  verification guide: [logsiegel-verify.txt](https://anycast.dev/.well-known/logsiegel-verify.txt) ·
+  public key: [logsiegel-pubkey.txt](https://anycast.dev/.well-known/logsiegel-pubkey.txt)
+- **PII masking of stored payloads (production PII engine).** The optional
+  `logsiegel[saklam]` extra (since 0.1.1) masks personal data in stored
+  payloads in-process via the [Saklam](https://saklam.com) engine, a
+  commercial PII engine running in production. It requires a licence key;
+  the engine is not open source. Without the extra, Logsiegel uses its
+  built-in regex detector or any other pluggable detector.
+
 ## How verification works
 
 1. Each entry embeds the SHA-256 of its predecessor (hash chain); appends
