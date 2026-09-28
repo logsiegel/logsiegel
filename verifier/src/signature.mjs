@@ -34,6 +34,27 @@ export function spkiFromInput(input) {
   return der;
 }
 
+const PEM_BLOCK = /-----BEGIN PUBLIC KEY-----[A-Za-z0-9+/=\s]+?-----END PUBLIC KEY-----/g;
+const ORIGIN_LABEL = /^[ \t]*Origin:[ \t]*(\S+)[ \t]*$/gim;
+
+/**
+ * Split a published key list (one PEM block per log, each preceded by an
+ * "Origin: <origin>" label) into its blocks. A plain single-key file yields
+ * one block; bare base64 yields none.
+ * @returns {{pem: string, origin: string|null}[]}
+ */
+export function splitKeyFile(text) {
+  if (typeof text !== "string") return [];
+  const blocks = [];
+  let last = 0;
+  for (const m of text.matchAll(PEM_BLOCK)) {
+    const labels = [...text.slice(last, m.index).matchAll(ORIGIN_LABEL)];
+    blocks.push({ pem: m[0], origin: labels.length ? labels[labels.length - 1][1] : null });
+    last = m.index + m[0].length;
+  }
+  return blocks;
+}
+
 /**
  * @returns {Promise<{key: CryptoKey, spkiDer: Uint8Array}>}
  * Throws with a clear message when the runtime lacks WebCrypto Ed25519.

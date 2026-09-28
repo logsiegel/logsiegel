@@ -139,7 +139,7 @@ const I18N = {
     receiptTitle: "Beleg (receipt.json)",
     receiptHint: "Datei hierher ziehen, klicken oder Inhalt einfügen",
     keyTitle: "Öffentlicher Schlüssel",
-    keyHint: "PEM-Datei (signing_key.pub) hierher ziehen, klicken oder einfügen",
+    keyHint: "PEM-Datei (signing_key.pub) oder Schlüsselliste hierher ziehen, klicken oder einfügen",
     keyTrust: "Wichtig: Beziehen Sie den öffentlichen Schlüssel unabhängig von demjenigen, der Ihnen den Beleg gegeben hat — sonst prüfen Sie nur, ob der Absender mit sich selbst übereinstimmt.",
     loaded: "geladen",
     valid: "BELEG GÜLTIG",
@@ -148,6 +148,8 @@ const I18N = {
     explainStructure: "Der Beleg ist beschädigt oder unvollständig — er hat nicht die erwartete Form.",
     explainSignature: "Die Signatur des Prüfpunkts passt nicht zum öffentlichen Schlüssel. Dieser Prüfpunkt stammt nicht vom Inhaber dieses Schlüssels — oder wurde nachträglich verändert.",
     explainInclusion: "Der Eintrag ist nicht Teil des Logs, auf das sich der signierte Prüfpunkt festlegt — der Inhalt wurde verändert oder der Beleg ist gefälscht.",
+    noKey: "KEIN PASSENDER SCHLÜSSEL",
+    explainKey: "Kein passender Schlüssel in der Datei: keiner der Schlüssel in der Schlüsseldatei gehört zu diesem Beleg. Das sagt nichts darüber, ob der Beleg verändert wurde — bitte den Schlüssel für diesen Log (siehe Herkunft im Beleg) beschaffen.",
     stageStructure: "Struktur",
     stageSignature: "Signatur",
     stageInclusion: "Aufnahme im Log",
@@ -173,7 +175,7 @@ const I18N = {
     receiptTitle: "Receipt (receipt.json)",
     receiptHint: "Drop the file here, click, or paste its content",
     keyTitle: "Public key",
-    keyHint: "Drop the PEM file (signing_key.pub) here, click, or paste",
+    keyHint: "Drop the PEM file (signing_key.pub) or key list here, click, or paste",
     keyTrust: "Important: obtain the public key independently of whoever handed you the receipt — otherwise you only check that the sender agrees with themselves.",
     loaded: "loaded",
     valid: "RECEIPT VALID",
@@ -182,6 +184,8 @@ const I18N = {
     explainStructure: "The receipt is damaged or incomplete — it does not have the expected shape.",
     explainSignature: "The checkpoint signature does not match the public key. This checkpoint was not issued by the holder of this key — or was modified afterwards.",
     explainInclusion: "The entry is not part of the log the signed checkpoint commits to — the content was changed or the receipt is forged.",
+    noKey: "NO MATCHING KEY",
+    explainKey: "No matching key in the file: none of the keys in the key file belongs to this receipt. This says nothing about whether the receipt was modified — please obtain the key for this log (see the origin in the receipt).",
     stageStructure: "Structure",
     stageSignature: "Signature",
     stageInclusion: "Log inclusion",
@@ -207,7 +211,7 @@ const I18N = {
     receiptTitle: "Justificatif (receipt.json)",
     receiptHint: "Déposez le fichier ici, cliquez, ou collez son contenu",
     keyTitle: "Clé publique",
-    keyHint: "Déposez le fichier PEM (signing_key.pub) ici, cliquez, ou collez",
+    keyHint: "Déposez le fichier PEM (signing_key.pub) ou la liste de clés ici, cliquez, ou collez",
     keyTrust: "Important : procurez-vous la clé publique indépendamment de la personne qui vous a remis le justificatif — sinon vous vérifiez seulement que l'expéditeur est d'accord avec lui-même.",
     loaded: "chargé",
     valid: "JUSTIFICATIF VALIDE",
@@ -216,6 +220,8 @@ const I18N = {
     explainStructure: "Le justificatif est endommagé ou incomplet — il n'a pas la forme attendue.",
     explainSignature: "La signature du point de contrôle ne correspond pas à la clé publique. Ce point de contrôle n'a pas été émis par le détenteur de cette clé — ou a été modifié après coup.",
     explainInclusion: "L'entrée ne fait pas partie du journal auquel le point de contrôle signé s'engage — le contenu a été modifié ou le justificatif est falsifié.",
+    noKey: "AUCUNE CLÉ CORRESPONDANTE",
+    explainKey: "Aucune clé correspondante dans le fichier : aucune des clés du fichier n'appartient à ce justificatif. Cela ne dit rien sur une éventuelle modification du justificatif — veuillez vous procurer la clé de ce journal (voir l'origine dans le justificatif).",
     stageStructure: "Structure",
     stageSignature: "Signature",
     stageInclusion: "Inclusion dans le journal",
@@ -345,18 +351,18 @@ async function run() {
     return;
   }
 
-  let imported;
+  let result;
   try {
-    imported = await importPublicKey(keyText);
+    result = await verifyReceiptWithKeyFile(receipt, keyText);
   } catch (err) {
     showError(t("errKey") + err.message);
     return;
   }
 
-  const result = await verifyReceipt(receipt, imported.key);
   const v = $("verdict");
   v.className = result.ok ? "ok" : "fail";
-  $("verdict-headline").textContent = result.ok ? t("valid") : t("invalid");
+  $("verdict-headline").textContent = result.ok ? t("valid")
+    : result.failedStage === "key" ? t("noKey") : t("invalid");
   $("verdict-explain").textContent = result.ok
     ? t("explainOk")
     : t("explain" + result.failedStage[0].toUpperCase() + result.failedStage.slice(1));
@@ -376,7 +382,7 @@ async function run() {
   if (result.ok) {
     const e = receipt.entry;
     const cp = receipt.checkpoint;
-    const fp = await keyFingerprint(imported.spkiDer);
+    const fp = await keyFingerprint(result.spkiDer);
     details =
       `<tr><td>${esc(t("dOrigin"))}</td><td>${esc(receipt.origin)}</td></tr>` +
       `<tr><td>${esc(t("dSeq"))}</td><td>${esc(receipt.seq)}</td></tr>` +
