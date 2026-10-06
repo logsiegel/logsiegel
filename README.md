@@ -156,12 +156,15 @@ agrees with the Python reference on every test vector. 57 tests.
 Roadmap: agent-action taxonomy (tool calls, delegation, value flows, human
 intervention) with OTel GenAI span semantics, mandate binding to verifiable
 credentials / eID ecosystems, independent witness co-signing (C2SP-style
-checkpoints), retention policy engine, TypeScript SDK, mapping to emerging
+checkpoints), browser verification of whole trails and dossiers with
+timeline and mandate status (today the browser verifier checks single
+receipts), retention policy engine, TypeScript SDK, mapping to emerging
 logging standards (EU AI Act Art. 12, prEN 18229-1, ISO/IEC 24970).
 
 ## Maintainers
 
-Stefan Böck (code) and Emmanuelle St-Pierre-Wittwer (regulatory).
+Stefan Böck (architecture, cryptography, core) and Emmanuelle
+St-Pierre-Wittwer (development, regulatory mapping).
 Project site: [logsiegel.com](https://logsiegel.com) · contact:
 logsiegel@stefan.boeck.name · security reports: [SECURITY.md](SECURITY.md)
 
