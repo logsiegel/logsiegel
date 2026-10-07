@@ -4,6 +4,29 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+CLI exit codes are now consistent: 0 success, 1 integrity check failed,
+2 usage or I/O error. The library API and all proof formats are unchanged.
+
+### Changed
+
+- **Behaviour change:** `logsiegel export` exits with 1 when the integrity
+  verification in the dossier is FAIL (was 0). The dossier is still written.
+- **Behaviour change:** `logsiegel shred` exits with 1 when the log fails
+  verification after shredding (was 0). The payload is still shredded.
+
+### Fixed
+
+- Expected operator errors print one line `error: …` on stderr and exit with 2
+  instead of a Python traceback: `init` on an existing log, a missing log
+  directory, `receipt` for an unknown entry or without a covering checkpoint,
+  `shred` or `payload` on an already shredded entry, a missing or malformed
+  receipt file, and a malformed `--pubkey` PEM file.
+- `log` (and every other command except `init`) no longer creates a bare
+  `log.jsonl` without keys and origin in a directory that holds no log; it
+  exits with 2 and `error: no log at DIR (run 'logsiegel init' first)`.
+
 ## 0.1.2 — 2026-09-13
 
 Packaging metadata (project URLs, classifiers), SECURITY.md, no code changes.

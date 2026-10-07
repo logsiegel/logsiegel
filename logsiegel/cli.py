@@ -9,7 +9,11 @@ from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
 
-from .core import EVENT_TYPES, Logsiegel, verify_receipt
+from .core import EVENT_TYPES, LOG_FILE, Logsiegel, verify_receipt
+
+
+class UsageError(Exception):
+    """An expected operator error: reported as one line on stderr, exit code 2."""
 
 
 def _attrs(pairs: list[str]) -> dict:
@@ -20,6 +24,23 @@ def _attrs(pairs: list[str]) -> dict:
         k, v = p.split("=", 1)
         out[k] = v
     return out
+
+
+def _load_pubkey(path: str):
+    try:
+        return serialization.load_pem_public_key(Path(path).read_bytes())
+    except ValueError as exc:
+        raise UsageError(f"{path}: not a PEM public key") from exc
+
+
+def _load_receipt(path: str) -> dict:
+    try:
+        rec = json.loads(Path(path).read_text())
+    except ValueError as exc:  # also covers UnicodeDecodeError
+        raise UsageError(f"{path}: not valid JSON ({exc})") from exc
+    if not isinstance(rec, dict):
+        raise UsageError(f"{path}: not a receipt (expected a JSON object)")
+    return rec
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -74,9 +95,22 @@ def main(argv: list[str] | None = None) -> int:
 
     args = ap.parse_args(argv)
 
+    # Exit codes: 0 success, 1 integrity check failed, 2 usage or I/O error.
+    # Only expected errors are caught here; anything else keeps its traceback.
+    try:
+        return _run(args)
+    except UsageError as exc:
+        msg = str(exc)
+    except OSError as exc:
+        msg = f"{exc.filename}: {exc.strerror}" if exc.filename and exc.strerror else str(exc)
+    print(f"error: {msg}", file=sys.stderr)
+    return 2
+
+
+def _run(args: argparse.Namespace) -> int:
     if args.cmd == "verify-receipt":
-        rec = json.loads(Path(args.receipt).read_text())
-        pub = serialization.load_pem_public_key(Path(args.pubkey).read_bytes())
+        rec = _load_receipt(args.receipt)
+        pub = _load_pubkey(args.pubkey)
         r = verify_receipt(rec, pub)
         status = "PASS" if r.ok else "FAIL"
         print(f"{status}: entry {rec.get('seq')} of origin {rec.get('origin')!r}")
@@ -85,10 +119,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if r.ok else 1
 
     if args.cmd == "init":
-        lb = Logsiegel.init(args.dir, origin=args.origin)
+        try:
+            lb = Logsiegel.init(args.dir, origin=args.origin)
+        except FileExistsError as exc:
+            raise UsageError(str(exc)) from exc
         print(f"initialized log in {args.dir} (origin={lb.origin}, key={lb.public_key_fingerprint()})")
         return 0
 
+    # Every other command works on an existing log; never create one implicitly.
+    if not (Path(args.dir) / LOG_FILE).is_file():
+        raise UsageError(f"no log at {args.dir} (run 'logsiegel init' first)")
     lb = Logsiegel(args.dir)
 
     if args.cmd == "log":
@@ -108,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "verify":
         pub = None
         if args.pubkey:
-            pub = serialization.load_pem_public_key(Path(args.pubkey).read_bytes())
+            pub = _load_pubkey(args.pubkey)
         r = lb.verify(public_key=pub)
         status = "PASS" if r.ok else "FAIL"
         print(f"{status}: {r.entries} entries, {r.checkpoints} checkpoints")
@@ -117,7 +157,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if r.ok else 1
 
     if args.cmd == "receipt":
-        rec = lb.receipt(args.seq)
+        try:
+            rec = lb.receipt(args.seq)
+        except (IndexError, ValueError) as exc:
+            raise UsageError(str(exc)) from exc
         text = json.dumps(rec, ensure_ascii=False, indent=1)
         if args.out == "-":
             print(text)
@@ -133,16 +176,24 @@ def main(argv: list[str] | None = None) -> int:
         else:
             Path(args.out).write_text(text)
             print(f"dossier written to {args.out}")
-        return 0
+        # The dossier is written either way; a failed integrity check is the exit code.
+        return 0 if lb.verify().ok else 1
 
     if args.cmd == "shred":
-        lb.shred(args.seq)
+        try:
+            lb.shred(args.seq)
+        except KeyError as exc:
+            raise UsageError(exc.args[0]) from exc
         r = lb.verify()
         print(f"payload of entry {args.seq} shredded; log verification: {'PASS' if r.ok else 'FAIL'}")
-        return 0
+        return 0 if r.ok else 1
 
     if args.cmd == "payload":
-        print(json.dumps(lb.read_payload(args.seq), ensure_ascii=False, indent=1))
+        try:
+            payload = lb.read_payload(args.seq)
+        except KeyError as exc:
+            raise UsageError(exc.args[0]) from exc
+        print(json.dumps(payload, ensure_ascii=False, indent=1))
         return 0
 
     return 2
