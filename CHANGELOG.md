@@ -9,6 +9,15 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 CLI exit codes are now consistent: 0 success, 1 integrity check failed,
 2 usage or I/O error. The library API and all proof formats are unchanged.
 
+### Added
+
+- Optional system metadata at `init`: `--system-name`, `--purpose`,
+  `--provider`, `--retention` (library: `Logsiegel.init(..., metadata={...})`,
+  read back via `Logsiegel.metadata`). Stored as free text in `metadata.json`
+  and shown in a `## System` section of the dossier, marked as declared by
+  the operator and not covered by the log's signatures. The retention period
+  is not enforced. Logs without metadata and their dossiers are unchanged.
+
 ### Changed
 
 - **Behaviour change:** `logsiegel export` exits with 1 when the integrity

@@ -49,6 +49,7 @@ KEY_FILE = "keys/signing_key.pem"
 PUB_FILE = "keys/signing_key.pub"
 PAYLOAD_DIR = "payloads"
 PAYLOAD_KEYS_FILE = "keys/payload_keys.json"
+METADATA_FILE = "metadata.json"
 
 GENESIS = "sha256:" + hashlib.sha256(b"logsiegel-genesis").hexdigest()
 
@@ -64,6 +65,15 @@ EVENT_TYPES = (
     "anomaly",
 )
 
+# Optional descriptive fields for the dossier, declared once at init.
+# Free text, not signed: field name -> label in the dossier.
+METADATA_FIELDS = {
+    "system_name": "System name",
+    "purpose": "Purpose",
+    "provider": "Provider",
+    "retention": "Retention",
+}
+
 
 def canonical(obj: dict) -> bytes:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
@@ -75,6 +85,19 @@ def _now() -> str:
 
 def _salted_hash(salt: bytes, text: str) -> str:
     return "sha256:" + hashlib.sha256(salt + text.encode()).hexdigest()
+
+
+def _check_metadata(metadata: dict) -> None:
+    """Reject unknown fields and empty, multi-line or non-text values."""
+    for name, value in metadata.items():
+        if name not in METADATA_FIELDS:
+            raise ValueError(
+                f"unknown metadata field {name!r}; expected one of {tuple(METADATA_FIELDS)}"
+            )
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"metadata field {name!r} must be a non-empty string")
+        if "\n" in value or "\r" in value:  # would break the list in the dossier
+            raise ValueError(f"metadata field {name!r} must be a single line")
 
 
 @dataclass
@@ -143,7 +166,16 @@ class Logsiegel:
     # -- setup -----------------------------------------------------------
 
     @classmethod
-    def init(cls, directory: str | Path, origin: str = "logsiegel-poc") -> "Logsiegel":
+    def init(
+        cls,
+        directory: str | Path,
+        origin: str = "logsiegel-poc",
+        metadata: dict | None = None,
+    ) -> "Logsiegel":
+        """Create a new log. `metadata` holds optional descriptive fields
+        (see METADATA_FIELDS) for the dossier; they are not signed."""
+        metadata = metadata or {}
+        _check_metadata(metadata)  # before anything is written
         lb = cls(directory)
         if (lb.dir / LOG_FILE).exists():
             raise FileExistsError(f"{lb.dir} already contains a log")
@@ -167,6 +199,8 @@ class Logsiegel:
         )
         (lb.dir / PAYLOAD_KEYS_FILE).write_text("{}")
         (lb.dir / "origin").write_text(origin)
+        if metadata:
+            (lb.dir / METADATA_FILE).write_text(json.dumps(metadata, indent=1, ensure_ascii=False))
         (lb.dir / LOG_FILE).touch()
         (lb.dir / CHECKPOINT_FILE).touch()
         return lb
@@ -174,6 +208,14 @@ class Logsiegel:
     @property
     def origin(self) -> str:
         return (self.dir / "origin").read_text().strip()
+
+    @property
+    def metadata(self) -> dict:
+        """Descriptive fields declared at init; empty if none were given."""
+        path = self.dir / METADATA_FILE
+        if not path.exists():
+            return {}
+        return json.loads(path.read_text())
 
     def _private_key(self) -> Ed25519PrivateKey:
         return serialization.load_pem_private_key((self.dir / KEY_FILE).read_bytes(), password=None)
@@ -451,6 +493,20 @@ class Logsiegel:
         ]
         for p in report.problems:
             lines.append(f"  - problem: {p}")
+
+        metadata = self.metadata
+        if metadata:
+            lines += [
+                "",
+                "## System",
+                "",
+                "Declared by the operator at init. Not covered by the log's signatures.",
+                "",
+            ]
+            for name, label in METADATA_FIELDS.items():
+                if name in metadata:
+                    lines.append(f"- {label}: {metadata[name]}")
+
         lines += [
             "",
             "## Events",

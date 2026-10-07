@@ -9,7 +9,7 @@ from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
 
-from .core import EVENT_TYPES, LOG_FILE, Logsiegel, verify_receipt
+from .core import EVENT_TYPES, LOG_FILE, METADATA_FIELDS, Logsiegel, verify_receipt
 
 
 class UsageError(Exception):
@@ -50,6 +50,11 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("init", help="create a new log")
     p.add_argument("dir")
     p.add_argument("--origin", default="logsiegel-poc")
+    # Optional descriptive fields for the dossier (stored in metadata.json, not signed).
+    p.add_argument("--system-name")
+    p.add_argument("--purpose")
+    p.add_argument("--provider")
+    p.add_argument("--retention", help="declared retention period (free text, not enforced)")
 
     p = sub.add_parser("log", help="append an event")
     p.add_argument("dir")
@@ -119,9 +124,14 @@ def _run(args: argparse.Namespace) -> int:
         return 0 if r.ok else 1
 
     if args.cmd == "init":
+        metadata = {}
+        for name in METADATA_FIELDS:
+            value = getattr(args, name)  # --system-name is stored as args.system_name
+            if value is not None:
+                metadata[name] = value
         try:
-            lb = Logsiegel.init(args.dir, origin=args.origin)
-        except FileExistsError as exc:
+            lb = Logsiegel.init(args.dir, origin=args.origin, metadata=metadata)
+        except (FileExistsError, ValueError) as exc:
             raise UsageError(str(exc)) from exc
         print(f"initialized log in {args.dir} (origin={lb.origin}, key={lb.public_key_fingerprint()})")
         return 0
