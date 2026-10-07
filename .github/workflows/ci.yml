@@ -17,3 +17,14 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e . pytest
       - run: pytest -q
+
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test
+        working-directory: verifier
+      - run: node verifier/build.mjs
