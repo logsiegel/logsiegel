@@ -56,6 +56,8 @@ pip install logsiegel            # from source: pip install -e ".[dev]"
 pip install "logsiegel[saklam]"  # optional: in-process PII masking of stored payloads (Saklam licence key required)
 
 logsiegel init ./mylog --origin "acme.example/support-bot"
+# optional, shown in the dossier (declared, not signed):
+#   --system-name … --purpose … --provider … --retention …
 logsiegel log ./mylog --event inference \
   --attr gen_ai.request.model=gpt-5 --attr gen_ai.usage.input_tokens=412 \
   --input "customer question …" --output "answer …" --store-payload

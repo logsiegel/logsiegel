@@ -367,3 +367,55 @@ def test_verify_rejects_broken_pubkey(log_dir, tmp_path, capsys):
     capsys.readouterr()
     assert main(["verify", str(log_dir), "--pubkey", str(bad)]) == 2
     assert_error(capsys, "bad.pem: not a PEM public key")
+
+
+# -- init metadata -------------------------------------------------------
+
+
+def test_init_metadata_appears_in_export(tmp_path, capsys):
+    d = tmp_path / "meta"
+    assert main([
+        "init", str(d), "--origin", "cli-test",
+        "--system-name", "Support bot", "--purpose", "Answer customer questions",
+        "--provider", "Acme GmbH", "--retention", "6 months",
+    ]) == 0
+    assert main(["log", str(d), "--event", "system_start"]) == 0
+    assert main(["checkpoint", str(d)]) == 0
+    capsys.readouterr()
+    assert main(["export", str(d)]) == 0
+
+    out = capsys.readouterr().out
+    assert "## System" in out
+    assert "- System name: Support bot" in out
+    assert "- Purpose: Answer customer questions" in out
+    assert "- Provider: Acme GmbH" in out
+    assert "- Retention: 6 months" in out
+    assert "Not covered by the log's signatures." in out
+
+
+def test_init_without_metadata_options_writes_no_metadata_file(tmp_path):
+    d = tmp_path / "plain"
+    assert main(["init", str(d)]) == 0
+    assert not (d / "metadata.json").exists()
+
+
+def test_init_rejects_empty_metadata_value(tmp_path, capsys):
+    d = tmp_path / "bad"
+    assert main(["init", str(d), "--purpose", ""]) == 2
+    assert_error(capsys, "'purpose' must be a non-empty string")
+    assert not d.exists()
+
+
+def test_verify_copy_with_metadata_without_private_key(tmp_path, capsys):
+    d = tmp_path / "meta"
+    assert main(["init", str(d), "--system-name", "Support bot"]) == 0
+    assert main(["log", str(d), "--event", "system_start"]) == 0
+    assert main(["checkpoint", str(d)]) == 0
+    copy = tmp_path / "copy"
+    copy.mkdir()
+    for name in ("log.jsonl", "checkpoints.jsonl", "origin", "metadata.json"):
+        (copy / name).write_bytes((d / name).read_bytes())
+    capsys.readouterr()
+    pub = d / "keys" / "signing_key.pub"
+    assert main(["verify", str(copy), "--pubkey", str(pub)]) == 0
+    assert "PASS: 1 entries, 1 checkpoints" in capsys.readouterr().out

@@ -138,3 +138,62 @@ def test_verify_with_external_pubkey(lb, tmp_path):
     other = Logsiegel.init(tmp_path / "other", origin="test")
     r = lb.verify(public_key=other.public_key())
     assert not r.ok  # wrong trust anchor → signatures must not check out
+
+
+# -- metadata ------------------------------------------------------------
+
+METADATA = {
+    "system_name": "Support bot",
+    "purpose": "Answer customer questions",
+    "provider": "Acme GmbH",
+    "retention": "6 months",
+}
+
+
+def test_init_with_metadata_writes_file(tmp_path):
+    lb = Logsiegel.init(tmp_path / "log", origin="test", metadata=METADATA)
+    assert (lb.dir / "metadata.json").exists()
+    assert lb.metadata == METADATA
+    assert Logsiegel(lb.dir).metadata == METADATA  # read back from disk
+
+
+def test_init_without_metadata_writes_no_file(lb):
+    assert not (lb.dir / "metadata.json").exists()
+    assert lb.metadata == {}
+
+
+@pytest.mark.parametrize("metadata, message", [
+    ({"owner": "Acme"}, "unknown metadata field 'owner'"),
+    ({"purpose": ""}, "'purpose' must be a non-empty string"),
+    ({"purpose": "   "}, "'purpose' must be a non-empty string"),
+    ({"retention": 6}, "'retention' must be a non-empty string"),
+    ({"provider": "Acme\n\n## Events"}, "'provider' must be a single line"),
+])
+def test_init_rejects_bad_metadata_before_writing(tmp_path, metadata, message):
+    with pytest.raises(ValueError, match=message):
+        Logsiegel.init(tmp_path / "log", origin="test", metadata=metadata)
+    assert not (tmp_path / "log").exists()
+
+
+def test_dossier_shows_declared_metadata(tmp_path):
+    lb = Logsiegel.init(tmp_path / "log", origin="test", metadata={"system_name": "Support bot"})
+    lb.append("system_start")
+    lb.checkpoint()
+    text = lb.export_dossier()
+    assert "## System" in text
+    assert "- System name: Support bot" in text
+    assert "Declared by the operator at init. Not covered by the log's signatures." in text
+    assert "Purpose" not in text  # only the fields that were set
+    assert text.index("## System") < text.index("## Events")
+
+
+def test_dossier_without_metadata_has_no_system_section(lb):
+    assert "## System" not in lb.export_dossier()
+
+
+def test_verify_passes_with_metadata_file(tmp_path):
+    lb = Logsiegel.init(tmp_path / "log", origin="test", metadata=METADATA)
+    lb.append("system_start")
+    lb.checkpoint()
+    r = lb.verify()
+    assert r.ok, r.problems
