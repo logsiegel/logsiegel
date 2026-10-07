@@ -5,5 +5,6 @@ __pycache__/
 .pytest_cache/
 examples/_demo_log/
 examples/_pii_demo_log/
+examples/_hiring_demo_log/
 dist/
 .DS_Store

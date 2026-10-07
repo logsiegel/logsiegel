@@ -70,6 +70,7 @@ logsiegel shred ./mylog --seq 1             # GDPR erasure; verify still passes
 
 Full walkthrough incl. receipts and tamper detection: `python examples/demo.py`
 (PII masking: `python examples/pii_demo.py`)
+(AI pre-screening in hiring, human decides, applicant receipt: `python examples/hiring_demo.py`)
 
 ## LiteLLM integration
 
