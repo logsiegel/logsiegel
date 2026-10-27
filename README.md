@@ -142,9 +142,10 @@ Logsiegel is tamper-*evident*, not tamper-*proof*. Precisely:
 
 ## Status
 
-v0.1.2 on PyPI (packaging metadata only — see [CHANGELOG.md](CHANGELOG.md)).
+v0.2.0 on PyPI: consistent CLI exit codes, declared system metadata in the
+dossier, vendor NER adapter moved out (see [CHANGELOG.md](CHANGELOG.md)).
 v0.1.1 added an optional in-process adapter for a vendor NER engine; it has
-since moved into that vendor's package (see CHANGELOG, Unreleased).
+since moved into that vendor's package (see CHANGELOG, 0.2.0).
 v0.1.0: local filesystem, minimal AI-lifecycle event taxonomy
 (pluggable per writer), RFC 6962 inclusion + consistency proofs,
 single-entry receipts, crypto-shredding, PII masking, dossier export,
