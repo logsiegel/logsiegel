@@ -97,11 +97,11 @@ def test_http_detector_parses_ner_response(monkeypatch):
         ).encode())
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
-    det = HttpDetector("http://localhost:8080/detect", detector_id="saklam-pii")
+    det = HttpDetector("http://localhost:8080/detect", detector_id="pii-container")
     found = det.detect(PROMPT)
     assert captured["body"] == {"text": PROMPT}
     assert found == [Detection("person", 9, 23)]
-    assert det.id == "saklam-pii"
+    assert det.id == "pii-container"
 
 
 def test_dossier_reports_pii_section(lb):
