@@ -9,6 +9,15 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 CLI exit codes are now consistent: 0 success, 1 integrity check failed,
 2 usage or I/O error. The library API and all proof formats are unchanged.
 
+### Removed
+
+- The optional `saklam` extra and `logsiegel.integrations.saklam`. The
+  adapter now ships with the `saklam` package itself
+  (`saklam.integrations.logsiegel.SaklamDetector`); this library keeps no
+  dependency on, or reference to, a specific NER vendor. The detector
+  interface in `logsiegel.pii` (`.id`, `.detect(text)`) is unchanged, so
+  existing code only changes its import.
+
 ### Added
 
 - Optional system metadata at `init`: `--system-name`, `--purpose`,

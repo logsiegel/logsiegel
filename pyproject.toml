@@ -46,9 +46,6 @@ Issues = "https://github.com/logsiegel/logsiegel/issues"
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 litellm = ["litellm"]
-# In-process-PII-Erkennung über die Saklam-Engine (Lizenzschlüssel nötig,
-# siehe logsiegel/integrations/saklam.py).
-saklam = ["saklam>=0.1"]
 
 [project.scripts]
 logsiegel = "logsiegel.cli:main"

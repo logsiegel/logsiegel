@@ -53,7 +53,6 @@ that don't have a compliance-engineering department.
 
 ```bash
 pip install logsiegel            # from source: pip install -e ".[dev]"
-pip install "logsiegel[saklam]"  # optional: in-process PII masking of stored payloads (Saklam licence key required)
 
 logsiegel init ./mylog --origin "acme.example/support-bot"
 # optional, shown in the dossier (declared, not signed):
@@ -101,12 +100,10 @@ recorded as `anomaly`.
   Trails: [anycast.dev/witness](https://anycast.dev/witness/) ·
   verification guide: [logsiegel-verify.txt](https://anycast.dev/.well-known/logsiegel-verify.txt) ·
   public key: [logsiegel-pubkey.txt](https://anycast.dev/.well-known/logsiegel-pubkey.txt)
-- **PII masking of stored payloads (production PII engine).** The optional
-  `logsiegel[saklam]` extra (since 0.1.1) masks personal data in stored
-  payloads in-process via the [Saklam](https://saklam.com) engine, a
-  commercial PII engine running in production. It requires a licence key;
-  the engine is not open source. Without the extra, Logsiegel uses its
-  built-in regex detector or any other pluggable detector.
+- **PII masking of stored payloads.** Detectors are pluggable: the built-in
+  regex detector, `HttpDetector` for an on-prem NER service, or any object
+  with `.id` and `.detect(text)`. Adapters for specific NER engines live in
+  those engines' own packages, not in this library.
 
 ## How verification works
 
@@ -146,8 +143,8 @@ Logsiegel is tamper-*evident*, not tamper-*proof*. Precisely:
 ## Status
 
 v0.1.2 on PyPI (packaging metadata only — see [CHANGELOG.md](CHANGELOG.md)).
-v0.1.1 added the optional `saklam` extra: in-process PII masking
-of stored payloads via the Saklam engine, no HTTP hop, licence key required.
+v0.1.1 added an optional in-process adapter for a vendor NER engine; it has
+since moved into that vendor's package (see CHANGELOG, Unreleased).
 v0.1.0: local filesystem, minimal AI-lifecycle event taxonomy
 (pluggable per writer), RFC 6962 inclusion + consistency proofs,
 single-entry receipts, crypto-shredding, PII masking, dossier export,
